@@ -10,6 +10,20 @@ Please download the executable from the corresponding GitHub release:
 
 * Release: [v2.0.2](https://github.com/SchulzSM/rsaToolbox/releases/tag/v2.0.2)
 
+## Requirements
+
+This executable requires the MATLAB Compiler Runtime (MCR):
+
+* Version: **7.14.1 (MATLAB R2010b)**
+
+The required runtime is **not included** in this repository.
+
+Please obtain the appropriate version from MathWorks:
+
+https://www.mathworks.com/products/compiler/matlab-runtime.html
+
+Note: Older versions of the MATLAB Runtime may not be directly available via the main download page and might require access via archived resources or MathWorks support.
+
 ## File integrity
 
 After downloading, verify the integrity of the file using the SHA256 checksum provided in `SHA256SUMS.txt`.
@@ -17,6 +31,5 @@ After downloading, verify the integrity of the file using the SHA256 checksum pr
 ## Notes
 
 * This executable is a 32-bit Windows build.
-* It requires the MATLAB Compiler Runtime (MCR).
-* This is the **current and final MATLAB-based release** of rsaToolbox.
-
+* This is the **final MATLAB-based release** of rsaToolbox.
+* Future development will focus on a Python reimplementation (planned as v3.x).
