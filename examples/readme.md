@@ -19,6 +19,11 @@ These example datasets can be used to:
 * apply respiration-corrected RSA analysis
 * test batch processing functionality
 
+## Versioning
+
+The example dataset is not version-specific and applies to all versions of rsaToolbox.
+It is provided once in this repository and can be used with all available implementations.
+
 ## Notes
 
 * The data are provided for demonstration purposes only.
