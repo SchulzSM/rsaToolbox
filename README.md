@@ -87,6 +87,18 @@ For detailed usage instructions, see the documentation in the `docs/` folder.
 
 ---
 
+## Reproducibility
+
+The repository includes:
+
+- raw example data  
+- preprocessing outputs  
+- reference implementation (Python)  
+
+allowing full reproducibility of preprocessing steps.
+
+---
+
 ## Example Data
 
 Example datasets are provided in the `examples/` directory:
@@ -94,8 +106,39 @@ Example datasets are provided in the `examples/` directory:
 * paced breathing data
 * experimental data
 
-These can be used to reproduce analyses and test functionality.
+These can be used to reproduce analyses and test functionality. The example dataset also includes precomputed preprocessing outputs, which can be used to validate independent implementations.
+A full worked example using these data is available in: `docs/worked_example.md`
+
 Note: These data are not version-specific and can be used with all versions of rsaToolbox.
+
+---
+
+## Documentation
+
+Detailed documentation and worked examples are available in the `docs/` directory:
+
+* **Quickstart (Example Dataset)**
+  `docs/quickstart_example.md`
+  → Step-by-step introduction using the provided example data
+
+* **Worked Example**
+  `docs/worked_example.md`
+  → Detailed walkthrough of preprocessing and synchronization
+
+* **Technical Manual (v2.0.2)**
+  `docs/manual_v2.0.2.md`
+  → Full processing workflow and interpretation of outputs
+
+* **Manual Preprocessing Specification**
+  `docs/manual_preprocessing_spec.md`
+  → Formal definition of required input files and synchronization logic
+
+* **Python Reference Implementation**
+  `docs/python_reference_preprocessing.md`
+  → Reference implementation of preprocessing logic for validation and future development
+
+* **Related Publications**
+  `docs/publications.md`
 
 ---
 
