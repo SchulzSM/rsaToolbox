@@ -9,6 +9,7 @@ The Windows executable is **not stored directly in the repository**, but is avai
 Please download the executable from the corresponding GitHub release:
 
 * Release: `v1.4.9`
+* https://github.com/SchulzSM/rsaToolbox/releases/tag/v1.4.9
 
 ## File integrity
 
