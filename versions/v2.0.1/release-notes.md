@@ -14,7 +14,21 @@ This release provides an updated MATLAB-based implementation of rsaToolbox, incl
 
 * Minor update within the 2.x release series.
 * Includes incremental improvements and bug fixes over v2.0.0.
-* The executable requires the MATLAB Compiler Runtime (MCR).
+
+## Requirements
+
+This executable requires the MATLAB Compiler Runtime (MCR):
+
+* Version: **7.14.1 (MATLAB R2010b)**
+
+The required runtime is not included in this repository.
+
+Please obtain the appropriate version from MathWorks or archived sources.
+See the MathWorks MATLAB Runtime page:
+
+https://www.mathworks.com/products/compiler/matlab-runtime.html
+
+Note: Older MCR versions may not be directly available via the main download page.
 
 ## Citation
 
