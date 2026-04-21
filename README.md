@@ -59,6 +59,9 @@ Run scripts from the `matlab/` directory.
 
 ### Executable version
 
+Note: This software requires MATLAB Compiler Runtime (MCR) 7.14.1 (R2010b).
+Older versions of the MCR may need to be obtained from MathWorks support or archival sources.
+
 1. Install MATLAB Compiler Runtime (MCR)
 2. Run the executable in `executable/`
 
