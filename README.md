@@ -95,6 +95,7 @@ Example datasets are provided in the `examples/` directory:
 * experimental data
 
 These can be used to reproduce analyses and test functionality.
+Note: These data are not version-specific and can be used with all versions of rsaToolbox.
 
 ---
 
