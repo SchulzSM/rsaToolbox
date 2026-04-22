@@ -20,7 +20,7 @@ keywords:
   - psychophysiology
 license: "LGPL-2.1-or-later"
 preferred-citation:
-  - type: article
+type: article
     authors:
       - family-names: "Schulz"
         given-names: "Stefan M."
