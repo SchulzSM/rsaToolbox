@@ -7,39 +7,3 @@ authors:
 repository-code: "https://github.com/SchulzSM/rsaToolbox"
 url: "https://github.com/SchulzSM/rsaToolbox"
 doi: "10.5281/zenodo.19693950"
-abstract: >-
-  Toolbox for analyzing respiration-corrected respiratory sinus arrhythmia (RSA)
-  from interbeat intervals, respiration cycles, and tidal volume data.
-keywords:
-- respiratory sinus arrhythmia
-- RSA
-- heart rate variability
-- vagal tone
-- respiration
-- tidal volume
-- psychophysiology
-license: "LGPL-2.1-or-later"
-references:
-- type: article
-authors:
-- family-names: "Schulz"
-given-names: "Stefan M."
-- family-names: "Ayala"
-given-names: "Erica"
-- family-names: "Dahme"
-given-names: "Bernhard"
-- family-names: "Ritz"
-given-names: "Thomas"
-title: >-
-A MATLAB toolbox for correcting within-individual effects of respiration
-rate and tidal volume on respiratory sinus arrhythmia during variable
-breathing
-journal: "Behavior Research Methods"
-year: 2009
-month: 11
-volume: 41
-issue: 4
-start: 1121
-end: 1126
-doi: "10.3758/BRM.41.4.1121"
-pmid: 19897819
