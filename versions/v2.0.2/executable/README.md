@@ -8,7 +8,7 @@ The Windows executable is **not stored directly in the repository**, but is avai
 
 Please download the executable from the corresponding GitHub release:
 
-* Release: [v2.0.2](https://github.com/SchulzSM/rsaToolbox/releases/tag/v2.0.2)
+* Release: [v2.0.2](https://github.com/SchulzSM/rsaToolbox/releases/tag/2.0.2)
 
 ## Requirements
 
