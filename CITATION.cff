@@ -30,7 +30,7 @@ preferred-citation:
       given-names: "Bernhard"
     - family-names: "Ritz"
       given-names: "Thomas"
-    title: >-
+  title: >-
 A MATLAB toolbox for correcting within-individual effects of respiration
 rate and tidal volume on respiratory sinus arrhythmia during variable
 breathing
