@@ -25,10 +25,10 @@ The rsaToolbox has evolved across multiple MATLAB-based releases and is currentl
 
 Published versions in this repository include:
 
-* 1.4.9
-* 2.0.0
-* 2.0.1
-* 2.0.2 (**current MATLAB version**)
+* v1.4.9
+* v2.0.0
+* v2.0.1
+* v2.0.2 (**current MATLAB version**)
 
 The version described in the original publication corresponds to an early development stage and was not released as a standalone version.
 Therefore, version v1.0.0 is not included.
