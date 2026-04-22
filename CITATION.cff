@@ -31,7 +31,7 @@ preferred-citation:
     - family-names: "Ritz"
       given-names: "Thomas"
   title: >-
-A MATLAB toolbox for correcting within-individual effects of respiration
+  A MATLAB toolbox for correcting within-individual effects of respiration
 rate and tidal volume on respiratory sinus arrhythmia during variable
 breathing
   journal: "Behavior Research Methods"
