@@ -2,16 +2,15 @@ cff-version: 1.2.0
 message: "If you use rsaToolbox, please cite the software and the associated method paper."
 title: "rsaToolbox"
 authors:
-
 - family-names: "Schulz"
   given-names: "Stefan M."
-  repository-code: "https://github.com/SchulzSM/rsaToolbox"
-  url: "https://github.com/SchulzSM/rsaToolbox"
-  doi: "10.5281/zenodo.19693950"
-  abstract: >-
+repository-code: "https://github.com/SchulzSM/rsaToolbox"
+url: "https://github.com/SchulzSM/rsaToolbox"
+doi: "10.5281/zenodo.19693950"
+abstract: >-
   Toolbox for analyzing respiration-corrected respiratory sinus arrhythmia (RSA)
   from interbeat intervals, respiration cycles, and tidal volume data.
-  keywords:
+keywords:
 - respiratory sinus arrhythmia
 - RSA
 - heart rate variability
@@ -19,10 +18,9 @@ authors:
 - respiration
 - tidal volume
 - psychophysiology
-  license: "LGPL-2.1-or-later"
-
-preferred-citation:
-type: article
+license: "LGPL-2.1-or-later"
+references:
+- type: article
 authors:
 - family-names: "Schulz"
 given-names: "Stefan M."
