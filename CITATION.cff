@@ -7,7 +7,7 @@ authors:
   given-names: "Stefan M."
   repository-code: "https://github.com/SchulzSM/rsaToolbox"
   url: "https://github.com/SchulzSM/rsaToolbox"
-  doi: 10.5281/zenodo.19693950
+  doi: "10.5281/zenodo.19693950"
   abstract: >-
   Toolbox for analyzing respiration-corrected respiratory sinus arrhythmia (RSA)
   from interbeat intervals, respiration cycles, and tidal volume data.
