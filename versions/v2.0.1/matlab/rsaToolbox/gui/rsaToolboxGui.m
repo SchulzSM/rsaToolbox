@@ -1,0 +1,3715 @@
+function varargout = rsaToolboxGui(varargin)
+% RSATOOLBOXGUI M-file for rsaToolboxGui.fig
+%	  RSATOOLBOXGUI, by itself, creates a new RSATOOLBOXGUI or raises the existing
+%	  singleton*.
+%
+%	  H = RSATOOLBOXGUI returns the handle to a new RSATOOLBOXGUI or the handle to
+%	  the existing singleton*.
+%
+%	  RSATOOLBOXGUI('CALLBACK',hObject,eventData,handles,...) calls the local
+%	  function named CALLBACK in RSATOOLBOXGUI.M with the given input arguments.
+%
+%	  RSATOOLBOXGUI('Property','Value',...) creates a new RSATOOLBOXGUI or raises the
+%	  existing singleton*.  Starting from the left, property value pairs are
+%	  applied to the GUI before rsaToolboxGui_OpeningFunction gets called.  An
+%	  unrecognized property name or invalid value makes property application
+%	  stop.  All inputs are passed to rsaToolboxGui_OpeningFcn via varargin.
+%
+%	  *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
+%	  instance to run (singleton)".
+%
+% See also: GUIDE, GUIDATA, GUIHANDLES
+
+% Edit the above text to modify the response to help rsaToolboxGui
+
+% Last Modified by GUIDE v2.5 07-May-2014 10:52:40
+
+% Begin initialization code - DO NOT EDIT
+gui_Singleton = 1;
+gui_State = struct('gui_Name',	   mfilename, ...
+				   'gui_Singleton',  gui_Singleton, ...
+				   'gui_OpeningFcn', @rsaToolboxGui_OpeningFcn, ...
+				   'gui_OutputFcn',  @rsaToolboxGui_OutputFcn, ...
+				   'gui_LayoutFcn',  [] , ...
+				   'gui_Callback',   []);
+if nargin & isstr(varargin{1})
+	gui_State.gui_Callback = str2func(varargin{1});
+end
+
+if nargout
+	[varargout{1:nargout}] = gui_mainfcn(gui_State, varargin{:});
+else
+	gui_mainfcn(gui_State, varargin{:});
+end
+% End initialization code - DO NOT EDIT
+
+% --- Executes just before rsaToolboxGui is made visible.
+function rsaToolboxGui_OpeningFcn(hObject, eventdata, handles, varargin)
+% This function has no output args, see OutputFcn.
+% hObject	handle to figure
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles	structure with handles and user data (see GUIDATA)
+% varargin   command line arguments to rsaToolboxGui (see VARARGIN)
+% Determine the position of the dialog - centered on the callback figure
+% if available, else, centered on the screen
+FigPos=get(0,'DefaultFigurePosition');
+OldUnits = get(hObject, 'Units');
+set(hObject, 'Units', 'pixels');
+OldPos = get(hObject,'Position');
+FigWidth = OldPos(3);
+FigHeight = OldPos(4);
+if isempty(gcbf)
+	ScreenUnits=get(0,'Units');
+	set(0,'Units','pixels');
+	ScreenSize=get(0,'ScreenSize');
+	set(0,'Units',ScreenUnits);
+
+	FigPos(1)=1/2*(ScreenSize(3)-FigWidth);
+	FigPos(2)=2/3*(ScreenSize(4)-FigHeight);
+else
+	GCBFOldUnits = get(gcbf,'Units');
+	set(gcbf,'Units','pixels');
+	GCBFPos = get(gcbf,'Position');
+	set(gcbf,'Units',GCBFOldUnits);
+	FigPos(1:2) = [(GCBFPos(1) + GCBFPos(3) / 2) - FigWidth / 2, ...
+				   (GCBFPos(2) + GCBFPos(4) / 2) - FigHeight / 2];
+end
+FigPos(3:4)=[FigWidth FigHeight];
+set(hObject, 'Position', FigPos);
+set(hObject, 'Units', OldUnits);
+
+global expertMode;
+global infantOption;
+global splitFilename;
+splitFilename=0;
+global answer;
+answer=[];
+handles.cal_button_load_Callback={};
+handles.exp_button_load_Callback={};
+handles.exp_RV={};
+handles.cal_R2={};
+handles.cal_df={};
+handles.cal_p={};
+handles.saveExpRsa_button_Callback=[];
+handles.saveExpRSAByVt_button_Callback=[];
+handles.saveExpTTOTcorrRsaByVt_button_Callback=[];
+ver='v2.0.1';
+axes(handles.output_rsa);
+plot([0],[0]);
+event_listString=get(handles.event_list,'String');
+event_listString=[event_listString;{'rsaToolbox v2.0.1'}];
+event_listString=[event_listString;{num2str(expertMode)}];
+event_listString=[event_listString;{'Program Author: Dr. Stefan M. Schulz'}];
+event_listString=[event_listString;{'Department of Psychology I'}];
+event_listString=[event_listString;{'University of Wuerzburg, Germany'}];
+event_listString=[event_listString;{'schulz@psychologie.uni-wuerzburg.de'}];
+event_listString=[event_listString;{'______________________________________________________________________'}];
+event_listString=[event_listString;{'rsaToolbox is publication-ware. This means, if you like rsaToolbox'}];
+event_listString=[event_listString;{'please add the following reference to your publication:'}];
+event_listString=[event_listString;{'Schulz S. M., Ayala, E., Dahme, B., Ritz, T. (2009)'}];
+event_listString=[event_listString;{'A MATLAB toolbox for correcting within-individual effects'}];
+event_listString=[event_listString;{'of respiration rate and tidal volume on respiratory sinus arrhythmia'}];
+event_listString=[event_listString;{'during variable breathing. Behavior Research Methods, 41 (4), 1121-1126.'}];
+event_listString=[event_listString;{'doi:10.3758/BRM.41.4.1121'}];
+event_listString=[event_listString;{'______________________________________________________________________'}];
+event_listString=[event_listString;{'rsaToolbox is released under the GNU LGPL v2.1 in the hope that it will be,'}];
+event_listString=[event_listString;{'useful but WITHOUT ANY WARRANTY; without even the implied warranty'}];
+event_listString=[event_listString;{'of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.'}];
+event_listString=[event_listString;{'See the GNU Lesser General Public License for more details.'}];
+event_listString=[event_listString;{'______________________________________________________________________'}];
+event_listString=[event_listString;{'Notifying me of your published reference entitles you to receive future'}];
+event_listString=[event_listString;{'program updates. Currently planned features include:'}];
+event_listString=[event_listString;{'- Graphic output of results for direct use in presentations and publications'}];
+event_listString=[event_listString;{'- Filtering options'}];
+event_listString=[event_listString;{'- Automated outlier detection (using default vs. user defined criteria)'}];
+event_listString=[event_listString;{'- Implementation of additional algorithms for computing RSA'}];
+event_listString=[event_listString;{'______________________________________________________________________'}];
+event_listString=[event_listString;{'Quick Reference'}];
+event_listString=[event_listString;{'- I highly recommmend trying out the batch functions.'}];
+event_listString=[event_listString;{'  They offer complete acces to all features'}];
+event_listString=[event_listString;{'  in the most comfortable fashion.'}];
+event_listString=[event_listString;{'  Note that any batch operation will be applied to all'}];
+event_listString=[event_listString;{'  data sets within a folder containing the data.'}];
+event_listString=[event_listString;{'  Output is then conveniently put together in combined files.'}];
+event_listString=[event_listString;{'  Input data has to meet certain requirements for being'}];
+event_listString=[event_listString;{'  batch processed. Please check "rsaToolbox Help" and the'}];
+event_listString=[event_listString;{'  readme.txt for further information.'}];
+event_listString=[event_listString;{'  If you do not want to bother preparing the files for'}];
+event_listString=[event_listString;{'  batch operation (details, see readme.txt), try out the rest.'}];
+event_listString=[event_listString;{'- Use the left pane to load matching files of one individual with'}];
+event_listString=[event_listString;{'  IBI [ms], VT [l], TTOT [s] recorded during paced breathing'}];
+event_listString=[event_listString;{'  at different frequencies (e.g. 8, 12, 16 breaths/min).'}];
+event_listString=[event_listString;{'  Data should be one column per file.'}];
+event_listString=[event_listString;{'  The first IBI value should synchronize the beginning of the first TTOT'}];
+event_listString=[event_listString;{'  with the beginning of the second value IBI (i.e., the first valid IBI).'}];
+event_listString=[event_listString;{'  In addition two files are required to exclude data from Analysis,'}];
+event_listString=[event_listString;{'  one for IBI, and one for TTOT and the respective VT.'}];
+event_listString=[event_listString;{'  These files consist of a matching number of cells with zeros for'}];
+event_listString=[event_listString;{'  any line that should be included, and a one ("1") for any line to be'}];
+event_listString=[event_listString;{'  excluded (see data example).'}];
+event_listString=[event_listString;{'  Note that the first IBI value is always excluded, hence the "1" in the'}];
+event_listString=[event_listString;{'  respective prefix_IBIflag.csv file.'}];
+event_listString=[event_listString;{'- Then use this data to compute slope and intercept'}];
+event_listString=[event_listString;{'  of the individual regression of TTOT upon RSA/VT.'}];
+event_listString=[event_listString;{'  Alternatively you may enter slope (B) and intercept manually.'}];
+event_listString=[event_listString;{'  '}];
+event_listString=[event_listString;{'- Use the right pane to load matching files of one individual with'}];
+event_listString=[event_listString;{'  IBI [ms], VT [l], TTOT [s] recorded during any number of'}];
+event_listString=[event_listString;{'  experimental recordings.'}];
+event_listString=[event_listString;{'- Then use slope (B) and intercept derived from paced breathing data, or'}];
+event_listString=[event_listString;{'  manually entered, to correct the data for individual effects'}];
+event_listString=[event_listString;{'  of VT and TTOT.'}];
+event_listString=[event_listString;{'  '}];
+event_listString=[event_listString;{'- All actions are documented in the event monitor text box.'}];
+event_listString=[event_listString;{'- All output data can be saved to ASCII files.'}];
+event_listString=[event_listString;{'  '}];
+event_listString=[event_listString;{'- Select "rsaToolbox Help" for further details on options and batch processing.'}];
+event_listString=[event_listString;{'______________________________________________________________________'}];
+event_listString=[event_listString;{'Thank you for using rsaToolbox!'}];
+event_listString=[event_listString;{'______________________________________________________________________'}];
+set(handles.event_list,'String',event_listString);
+% Choose default command line output for rsaToolboxGui
+handles.output = hObject;
+% Update handles structure
+guidata(hObject, handles);
+
+% UIWAIT makes rsaToolboxGui wait for user response (see UIRESUME)
+% uiwait(handles.figure1);
+
+% --- Outputs from this function are returned to the command line.
+function varargout = rsaToolboxGui_OutputFcn(hObject, eventdata, handles)
+% varargout  cell array for returning output args (see VARARGOUT);
+% hObject	handle to figure
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles	structure with handles and user data (see GUIDATA)
+
+% Get default command line output from handles structure
+varargout{1} = handles.output;
+
+
+%==========================================================================
+% --- Executes on button press in cal_button_load.
+function cal_button_load_Callback(hObject, eventdata, handles)
+% hObject	handle to cal_button_load (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles	structure with handles and user data (see GUIDATA)
+	dataCal=handles.cal_button_load_Callback;
+	[dataCal,newColCal]=rsaLoad(dataCal,'paced breathing');
+	event_listString=get(handles.event_list,'String');
+	if newColCal==1
+		event_listString=[event_listString;{'One recording was added to the paced breathing data set.'}];
+	else
+		event_listString=[event_listString;{[num2str(newColCal),' recordings were added to the paced breathing data set.']}];
+		if newColCal == 0
+			event_listString=[event_listString;{'______________________________________________________________________'}];
+		end;
+	end;
+	set(handles.event_list,'String',event_listString);
+	sTemp=size(event_listString);
+	set(handles.event_list,'Value',sTemp(1,1));
+	handles.cal_button_load_Callback=dataCal;
+	guidata(hObject,handles);
+
+% --- Executes on button press in cal_button_clear.
+function cal_button_clear_Callback(hObject, eventdata, handles)
+% hObject	handle to cal_button_clear (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles	structure with handles and user data (see GUIDATA)
+	dataCal=handles.cal_button_load_Callback;
+	if ~isempty(dataCal)
+		handles.cal_button_load_Callback={};
+		event_listString=get(handles.event_list,'String');
+		event_listString=[event_listString;{'Cleared paced breathing data set.'}];
+		event_listString=[event_listString;{'Load new data or enter slope (B) and intercept manually.'}];
+		event_listString=[event_listString;{'______________________________________________________________________'}];
+		set(handles.event_list,'String',event_listString);
+		sTemp=size(event_listString);
+		set(handles.event_list,'Value',sTemp(1,1));
+	end;
+	guidata(hObject,handles);
+
+% --- Executes on button press in exp_button_load.
+function exp_button_load_Callback(hObject, eventdata, handles)
+% hObject	handle to exp_button_load (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles	structure with handles and user data (see GUIDATA)
+	dataExp=handles.exp_button_load_Callback;
+	newColExp=0;
+	[dataExp,newColExp]=rsaLoad(dataExp,'experimental');
+	event_listString=get(handles.event_list,'String');
+	if newColExp==1
+		event_listString=[event_listString;{'One recording was added for applying the correction.'}];
+	else
+		event_listString=[event_listString;{[num2str(newColExp),' recordings were added for applying the correction.']}];
+		if newColExp == 0
+			event_listString=[event_listString;{'______________________________________________________________________'}];
+		end;
+
+	end;
+	if newColExp>0
+		set(handles.disp_results_text_2,'String',['of ',num2str(length(dataExp(1,:)))]);
+	end;
+	sTemp=size(event_listString);
+	set(handles.event_list,'Value',sTemp(1,1));
+	set(handles.event_list,'String',event_listString);
+	handles.exp_button_load_Callback=dataExp;
+	guidata(hObject,handles);
+
+% --- Executes on button press in exp_buttton_clear.
+function exp_buttton_clear_Callback(hObject, eventdata, handles)
+% hObject	handle to exp_buttton_clear (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles	structure with handles and user data (see GUIDATA)
+	dataExp=handles.exp_button_load_Callback;
+	if ~isempty(dataExp)
+		handles.exp_button_load_Callback={};
+		event_listString=get(handles.event_list,'String');
+		event_listString=[event_listString;{'Cleared experimental data set.'}];
+		event_listString=[event_listString;{'Load new data to apply correction.'}];
+		event_listString=[event_listString;{'______________________________________________________________________'}];
+		set(handles.event_list,'String',event_listString);
+		sTemp=size(event_listString);
+		set(handles.event_list,'Value',sTemp(1,1));
+		set(handles.disp_results_text_2,'String','of 0');
+		set(handles.select_result,'String','0');
+	end;
+	axes(handles.output_rsa);
+	plot([0],[0]);
+	guidata(hObject,handles);
+%==========================================================================
+
+
+
+% --- Executes on button press in cal_button_updateRegression.
+function cal_button_updateRegression_Callback(hObject, eventdata, handles)
+% hObject	handle to cal_button_updateRegression (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles	structure with handles and user data (see GUIDATA)
+	dataCal=handles.cal_button_load_Callback;
+	if isempty(dataCal)
+		event_listString=get(handles.event_list,'String');
+		event_listString=[event_listString;{'Please load paced breathing data to perform this function.'}];
+		event_listString=[event_listString;{'______________________________________________________________________'}];
+		set(handles.event_list,'String',event_listString);
+		sTemp=size(event_listString);
+		set(handles.event_list,'Value',sTemp(1,1));
+	else
+		event_listString=get(handles.event_list,'String');
+		event_listString=[event_listString;{'Computing slope (B) and intercept for correction.'}];
+		set(handles.event_list,'String',event_listString);
+		%perform correction
+		TTOT=dataCal(1,:);
+		IBI=dataCal(3,:);
+		flagIBICal=dataCal(5,:);
+		VT=dataCal(2,:);
+		flagTTOTCal=dataCal(4,:);
+		global infantOption;
+		[IBInoCal,IBImeanCal,IBIminCal,IBImaxCal,IBIdiffCal,IBIdiffTypeCal,HRperBreathCal,IBIcountCal]=rsaPeakValleyWindowed(TTOT,IBI,0,0,flagIBICal,infantOption);
+		[calibrationTTOTF,calibrationVTF,IBIcountCalF,IBImeanCalF,IBIminCalF,IBImaxCalF,IBIdiffCalF,calFlag,PVCfailCalF,notEnoughIBICalF,HRperBreathCalF,IBInoCalF]=rsaClearFlag(TTOT,VT,IBImeanCal,IBIminCal,IBImaxCal,IBIdiffCal,IBIdiffTypeCal,flagTTOTCal,IBInoCal,2);
+		for n=1:length(calFlag(1,:))
+			event_listString=[event_listString;{['Peak valley criterion met in ',num2str(PVCfailCalF(n)),' of ',num2str(length(find(flagTTOTCal{n}==0))),' valid breathing cycles in recording no. ',num2str(n)]}];
+		end;
+		event_listString=[event_listString;{'Note: For the calibration RSA obtained in these breaths is excluded rather than set to zero!'}];
+		[calibrationRV]=rsaNormalizeByVt(calibrationVTF,IBIdiffCalF);
+		global expertMode;
+		if expertMode==1
+			printMethodSelection=menu('Select print output for regression plot:','1 - Do not print figure','2 - Post script file (color -  high quality)','3 - High quality post script file (black/white - high quality - recommended for publications)','4 - Bitmap (color - not recommended)','5 - Bitmap (black/white - not recommended)','6 - JPEG (for email etc. - not recommended for publications','7 - TIFF','8 - Windows Metafile (.emf)');
+		else
+			printMethodSelection=6;
+		end;
+		[intercept,B,df,p,R2]=rsaRegress(calibrationRV,calibrationTTOTF,0,1,printMethodSelection);
+		set(handles.figure_x_axis,'String','TTOT [s]');
+		set(handles.figure_y_axis_left,'String','RSA/VT [ms/l]');
+		set(handles.output_rsa_caption,'String','Regression of paced breathing RSA/VT upon TTOT');
+		B=num2str(B);
+		intercept=num2str(intercept);
+		R2=num2str(R2);
+		df=num2str(df);
+		p=num2str(p);
+		handles.cal_R2=num2str(R2);
+		handles.cal_p=num2str(p);
+		handles.cal_df=num2str(df);
+		set(handles.cal_B,'String',B);
+		set(handles.cal_intercept,'String',intercept);
+		event_listString=[event_listString;{['B=',B,', intercept=',intercept,', R2=',R2,', df=',df,', p=',p]}];
+		global infantOption;
+		if infantOption==1
+			 event_listString=[event_listString;{'Note: infant option is on.'}];
+		else
+			 event_listString=[event_listString;{'Note: infant option is off.'}];
+		end;
+		event_listString=[event_listString;{'______________________________________________________________________'}];
+		set(handles.event_list,'String',event_listString);
+		sTemp=size(event_listString);
+		set(handles.event_list,'Value',sTemp(1,1));
+	end;
+	guidata(hObject,handles);
+
+
+% --- Executes on button press in exp_button_applyCalibration.
+function exp_button_applyCalibration_Callback(hObject, eventdata, handles)
+% hObject	handle to exp_button_applyCalibration (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles	structure with handles and user data (see GUIDATA)
+	dataExp=handles.exp_button_load_Callback;
+	event_listString=get(handles.event_list,'String');
+	if isempty(dataExp)
+		event_listString=[event_listString;{'Please load experimental data to perform this function.'}];
+		event_listString=[event_listString;{'______________________________________________________________________'}];
+	else
+		intercept=get(handles.cal_intercept,'String');
+		intercept=str2double(intercept);
+		if isempty(intercept) | isnan(intercept)~=0
+			event_listString=[event_listString;{'Enter intercept or update from paced breathing data.'}];
+			event_listString=[event_listString;{'______________________________________________________________________'}];
+		else
+			B=get(handles.cal_B,'String');
+			B=str2double(B);
+			if isempty(B) | isnan(B)~=0
+				event_listString=[event_listString;{'Enter slope (B) or update from paced breathing data.'}];
+				event_listString=[event_listString;{'______________________________________________________________________'}];
+			else
+				event_listString=[event_listString;{'Performing correction of experimental data.'}];
+				TTOTExp=dataExp(1,:);
+				IBIExp=dataExp(3,:);
+				flagIBIExp=dataExp(5,:);
+				VTExp=dataExp(2,:);
+				flagTTOTExp=dataExp(4,:);
+				global infantOption;
+				[IBInoExp,IBImeanExp,IBIminExp,IBImaxExp,IBIdiffExp,IBIdiffTypeExp,HRperBreathExp,IBIcountExp]=rsaPeakValleyWindowed(TTOTExp,IBIExp,0,0,flagIBIExp,infantOption);
+				[experimentalTTOTF,experimentalVTF,IBIcountExpF,IBImeanExpF,IBIminExpF,IBImaxExpF,IBIdiffExpF,expFlag,PVCfailExpF,notEnoughIBIExpF,HRperBreathExpF,IBInoExpF]=rsaClearFlag(TTOTExp,VTExp,IBImeanExp,IBIminExp,IBImaxExp,IBIdiffExp,IBIdiffTypeExp,flagTTOTExp,IBInoExp,4);
+				for n=1:length(expFlag(1,:))
+					event_listString=[event_listString;{['Peak valley criterion met in ',num2str(PVCfailExpF(n)),' of ',num2str(length(find(flagTTOTExp{n}==0))),' valid breathing cycles in recording no. ',num2str(n)]}];
+				end;
+				event_listString=[event_listString;{'Note: RSA scores for these breaths is set to zero (see Grossman & Wientjes, 1986)!'}];
+				[experimentalRV,experimentalRVMean]=rsaNormalizeByVt(experimentalVTF,IBIdiffExpF);
+				[experimentalRVPre,experimentalRVPreCutoff,experimentalRVDif,experimentalRVDifCutoff,experimentalTTOTFCutoff,experimentalRVDifMean,experimentalRVDifCutoffMean,experimentalRVExpDifNan]=rsaApplyCal(experimentalTTOTF,experimentalRV,B,intercept,10);
+				axes(handles.output_rsa);
+				experimentalIBIdiffExpFTemp=IBIdiffExpF(:,1); %RSA
+				experimentalIBIdiffExpFTemp(isnan(experimentalIBIdiffExpFTemp))=[]; %RSA
+				experimentalRVPreTemp=experimentalRVPre(:,1); %Correction
+				experimentalRVPreTemp(isnan(experimentalRVPreTemp))=[]; %Correction
+				experimentalRVTemp=experimentalRV(:,1); %RSA/VT
+				experimentalRVTemp(isnan(experimentalRVTemp))=[]; %RSA/VT
+				experimentalRVDifTemp=experimentalRVDif(:,1); %TTOT-corrected RSA/VT
+				experimentalRVDifTemp(isnan(experimentalRVDifTemp))=[]; %TTOT-corrected RSA/VT
+				plot(experimentalRVTemp,'-r'); %RSA/VT
+				hold on;
+				plot(experimentalIBIdiffExpFTemp,'-k'); %RSA
+				plot(experimentalRVPreTemp,'-b'); %Correction
+				plot(experimentalRVDifTemp,'-g'); %TTOT-corrected RSA/VT
+				set(handles.figure_x_axis,'String','breathing cycles in the recording');
+				set(handles.figure_y_axis_left,'String','RSA [ms] and RSA/VT [ms/l]');
+				set(handles.output_rsa_caption,'String','BLACK: RSA, RED: RSA/VT, BLUE: Correction, GREEN: TTOT-corrected RSA/VT');
+				hold off;
+				set(handles.select_result,'String','1');
+				handles.exp_RSA=IBIdiffExpF; %RSA
+				handles.exp_RV=experimentalRV; %RSA/VT
+				handles.exp_RVPre=experimentalRVPre; %Correction
+				handles.saveExpRsa_button_Callback=IBIdiffExpF; %RSA
+				handles.saveExpRSAByVt_button_Callback=experimentalRV; %RSA/VT
+				handles.saveExpTTOTcorrRsaByVt_button_Callback=experimentalRVDif; %TTOT-corrected RSA/VT
+				global infantOption;
+				if infantOption==1
+					event_listString=[event_listString;{'Note: infant option is on.'}];
+				else
+					event_listString=[event_listString;{'Note: infant option is off.'}];
+				end;
+				event_listString=[event_listString;{'Correction procedure complete.'}];
+				event_listString=[event_listString;{'______________________________________________________________________'}];
+			end;
+		end;
+	end;
+	set(handles.event_list,'String',event_listString);
+	sTemp=size(event_listString);
+	set(handles.event_list,'Value',sTemp(1,1));
+	guidata(hObject,handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function cal_intercept_CreateFcn(hObject, eventdata, handles)
+% hObject	handle to cal_intercept (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles	empty - handles not created until after all CreateFcns called
+% Hint: edit controls usually have a white background on Windows.
+%	   See ISPC and COMPUTER.
+	if ispc
+		set(hObject,'BackgroundColor','white');
+	else
+		set(hObject,'BackgroundColor',get(0,'defaultUicontrolBackgroundColor'));
+	end
+
+function cal_intercept_Callback(hObject, eventdata, handles)
+% hObject	handle to cal_intercept (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles	structure with handles and user data (see GUIDATA)
+	event_listString=get(handles.event_list,'String');
+	interceptTemp=get(hObject,'String');
+	if ~isempty(str2num(interceptTemp))
+		intercept=interceptTemp;
+		set(handles.cal_intercept,'String',intercept);
+		handles.cal_R2='not set';
+		handles.cal_p='not set';
+		handles.cal_df='not set';
+		event_listString=[event_listString;{'Manual input of intercept. This results in reset of previously computed parameters:'}];
+		event_listString=[event_listString;{['B=',get(handles.cal_B,'String'),', intercept=',intercept,', R2=not set, df=not set, p=not set']}];
+		event_listString=[event_listString;{'______________________________________________________________________'}];
+	else
+		event_listString=[event_listString;{'Please enter a valid intercept!'}];
+		event_listString=[event_listString;{'______________________________________________________________________'}];
+	end;
+	set(handles.event_list,'String',event_listString);
+	sTemp=size(event_listString);
+	set(handles.event_list,'Value',sTemp(1,1));
+	guidata(hObject,handles);
+
+% --- Executes during object creation, after setting all properties.
+function cal_B_CreateFcn(hObject, eventdata, handles)
+% hObject	handle to cal_B (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles	empty - handles not created until after all CreateFcns called
+% Hint: edit controls usually have a white background on Windows.
+%	   See ISPC and COMPUTER.
+	if ispc
+		set(hObject,'BackgroundColor','white');
+	else
+		set(hObject,'BackgroundColor',get(0,'defaultUicontrolBackgroundColor'));
+	end
+
+function cal_B_Callback(hObject, eventdata, handles)
+% hObject	handle to cal_B (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles	structure with handles and user data (see GUIDATA)
+	event_listString=get(handles.event_list,'String');
+	BTemp=get(hObject,'String');
+	if ~isempty(str2num(BTemp))
+		B=BTemp;
+		set(handles.cal_B,'String',B);
+		handles.cal_R2='not set';
+		handles.cal_p='not set';
+		handles.cal_df='not set';
+		event_listString=[event_listString;{'Manual input of slope (B). This results in reset of previously computed parameters:'}];
+		event_listString=[event_listString;{['B=',B,', intercept=',get(handles.cal_intercept,'String'),', R2=not set, df=not set, p=not set']}];
+		event_listString=[event_listString;{'______________________________________________________________________'}];
+
+	else
+		  event_listString=[event_listString;{'Please enter a valid slope (B)!'}];
+		  event_listString=[event_listString;{'______________________________________________________________________'}];
+	end;
+	set(handles.event_list,'String',event_listString);
+	sTemp=size(event_listString);
+	set(handles.event_list,'Value',sTemp(1,1));
+	guidata(hObject,handles);
+
+
+
+% --- Executes during object creation, after setting all properties.
+function event_list_CreateFcn(hObject, eventdata, handles)
+% hObject	handle to event_list (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles	empty - handles not created until after all CreateFcns called
+% Hint: edit controls usually have a white background on Windows.
+%	   See ISPC and COMPUTER.
+	if ispc
+		set(hObject,'BackgroundColor','white');
+	else
+		set(hObject,'BackgroundColor',get(0,'defaultUicontrolBackgroundColor'));
+	end
+
+function event_list_Callback(hObject, eventdata, handles)
+% hObject	handle to event_list (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles	structure with handles and user data (see GUIDATA)
+% Hints: get(hObject,'String') returns contents of event_list as text
+%		str2double(get(hObject,'String')) returns contents of event_list as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function select_result_CreateFcn(hObject, eventdata, handles)
+% hObject	handle to select_result (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles	empty - handles not created until after all CreateFcns called
+% Hint: edit controls usually have a white background on Windows.
+%	   See ISPC and COMPUTER.
+	if ispc
+		set(hObject,'BackgroundColor','white');
+	else
+		set(hObject,'BackgroundColor',get(0,'defaultUicontrolBackgroundColor'));
+	end
+
+function select_result_Callback(hObject, eventdata, handles)
+% hObject	handle to select_result (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles	structure with handles and user data (see GUIDATA)
+% Hints: get(hObject,'String') returns contents of select_result as text
+%		str2double(get(hObject,'String')) returns contents of select_result as a double
+	dataExp=handles.exp_button_load_Callback;
+	event_listString=get(handles.event_list,'String');
+	if ~isempty(dataExp)
+		sTemp1=size(dataExp);
+		displayResultNo=str2double(get(hObject,'String'));
+		experimentalRV=handles.exp_RV;
+		sTemp2=size(experimentalRV);
+		if sTemp1(1,2)>sTemp2(1,2)
+			set(handles.select_result,'String','0');
+			axes(handles.output_rsa);
+			plot([0],[0]);
+			event_listString=[event_listString;{'Graphic output was reset.'}];
+			event_listString=[event_listString;{'Please run "Apply TTOT-Correction Parameters to Experimental Data" first!'}];
+			event_listString=[event_listString;{'______________________________________________________________________'}];
+		else
+			sTemp=size(dataExp);
+			if displayResultNo>0 && displayResultNo<=sTemp2(1,2)
+				axes(handles.output_rsa);
+				IBIdiffExpF=handles.exp_RSA;
+				experimentalRVPre=handles.exp_RVPre;
+				experimentalRVDif=handles.saveExpTTOTcorrRsaByVt_button_Callback;
+				experimentalIBIdiffExpFTemp=IBIdiffExpF(:,displayResultNo);
+				experimentalIBIdiffExpFTemp(isnan(experimentalIBIdiffExpFTemp))=[];
+				experimentalRVPreTemp=experimentalRVPre(:,displayResultNo);
+				experimentalRVPreTemp(isnan(experimentalRVPreTemp))=[];
+				experimentalRVTemp=experimentalRV(:,displayResultNo);
+				experimentalRVTemp(isnan(experimentalRVTemp))=[];
+				experimentalRVDifTemp=experimentalRVDif(:,displayResultNo);
+				experimentalRVDifTemp(isnan(experimentalRVDifTemp))=[];
+				plot(experimentalRVTemp,'-r');
+				hold on;
+				plot(experimentalIBIdiffExpFTemp,'-k');
+				plot(experimentalRVPreTemp,'-b');
+				plot(experimentalRVDifTemp,'-g');
+				set(handles.figure_x_axis,'String','breathing cycles in the recording');
+				set(handles.figure_y_axis_left,'String','RSA [ms] and RSA/VT [ms/l]');
+				set(handles.output_rsa_caption,'String','BLACK: RSA, RED: RSA/VT, BLUE: Correction, GREEN: TTOT-corrected RSA/VT');
+				hold off;
+				set(handles.select_result,'String',num2str(displayResultNo));
+				handles.exp_RV=experimentalRV;
+				handles.saveExpRsa_button_Callback=IBIdiffExpF;
+				handles.saveExpRSAByVt_button_Callback=experimentalRV;
+				handles.saveExpTTOTcorrRsaByVt_button_Callback=experimentalRVDif;
+				event_listString=[event_listString;{['Graphic output for experimental recording ',num2str(displayResultNo)]}];
+				event_listString=[event_listString;{'______________________________________________________________________'}];
+			else
+				set(handles.select_result,'String','0');
+				axes(handles.output_rsa);
+				plot([0],[0]);
+				event_listString=[event_listString;{'Graphic output was reset.'}];
+				event_listString=[event_listString;{'Error: Enter a valid number.'}];
+				event_listString=[event_listString;{'______________________________________________________________________'}];
+			end;
+		end;
+	else
+		set(handles.select_result,'String','0');
+		axes(handles.output_rsa);
+		plot([0],[0]);
+		event_listString=[event_listString;{'Graphic output was reset.'}];
+		event_listString=[event_listString;{'Error: Load experimental recording and apply correction.'}];
+		event_listString=[event_listString;{'______________________________________________________________________'}];
+	end;
+	set(handles.event_list,'String',event_listString);
+	sTemp=size(event_listString);
+	set(handles.event_list,'Value',sTemp(1,1));
+	guidata(hObject,handles);
+
+% --- Executes on button press in saveCal_button.
+function saveCal_button_Callback(hObject, eventdata, handles)
+% hObject	handle to saveCal_button (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles	structure with handles and user data (see GUIDATA)
+	[fileName,pathName] = uiputfile({'*.txt','tab-delimited ASCII file (*.txt)'},['Save current regression parameters to...']);
+	event_listString=get(handles.event_list,'String');
+	if isequal([fileName,pathName],[0,0])
+		event_listString=[event_listString;{'Current regression parameters were not saved to file.'}];
+		event_listString=[event_listString;{'Try again with a valid path and filename.'}];
+		event_listString=[event_listString;{'______________________________________________________________________'}];
+		return
+	% Otherwise construct the fullfilename and Check and load the file.
+	else
+		save_intercept=get(handles.cal_intercept,'String');
+		save_B=get(handles.cal_B,'String');
+		if ~isempty(str2num(save_intercept)) & ~isempty(str2num(save_B))
+			fid = fopen([pathName,'\',fileName,'.txt'],'wt');
+			if (fid < 0)
+				event_listString=[event_listString;{'Current regression parameters were not saved to file.'}];
+				event_listString=[event_listString;{'Try again with a valid path and filename.'}];
+				event_listString=[event_listString;{'______________________________________________________________________'}];
+			else
+				save_intercept=str2double(save_intercept);
+				save_B=str2double(save_B);
+				fprintf(fid,'%s\n',char('rsaToolbox v2.0.1 by Stefan M. Schulz <schulz@psychologie.uni-wuerzburg.de> - regression parameters'));
+				global infantOption;
+				if infantOption==1
+					fprintf(fid,'%s\n',char(['Note: infant option is',char(9),'on']));
+				else
+					fprintf(fid,'%s\n',char(['Note: infant option is',char(9),'off']));
+				end;
+				fprintf(fid,'%s\n',['intercept',char(9),'uncorrected_B',char(9),'R_squared',char(9),'df',char(9),'p']);
+				fprintf(fid,'%s\n',[char(num2str(save_intercept)),char(9),char(num2str(save_B)),char(9),char(num2str(handles.cal_R2)),char(9),char(num2str(handles.cal_df)),char(9),char(num2str(handles.cal_p))]);
+				event_listString=[event_listString;{['Current regression parameters were saved to ',pathName,'\',fileName]}];
+				event_listString=[event_listString;{'______________________________________________________________________'}];
+			end;
+			fclose(fid);
+		else
+			event_listString=[event_listString;{'Current regression parameters were not saved to file.'}];
+			event_listString=[event_listString;{'Try again with valid slope B and intercept.'}];
+			event_listString=[event_listString;{'______________________________________________________________________'}];
+		end;
+	end;
+	set(handles.event_list,'String',event_listString);
+	sTemp=size(event_listString);
+	set(handles.event_list,'Value',sTemp(1,1));
+	guidata(hObject,handles);
+
+% --- Executes on button press in saveMon_button.
+function saveMon_button_Callback(hObject, eventdata, handles)
+% hObject	handle to saveMon_button (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles	structure with handles and user data (see GUIDATA)
+	  event_listString=get(handles.event_list,'String');
+	[fileName,pathName] = uiputfile({'*.txt','ASCII-file (*.txt)'},['Save Event Monitor to...']);
+	if isequal([fileName,pathName],[0,0])
+		return
+	else
+		fid = fopen([pathName,'\',fileName,'.txt'],'wt');
+		if (fid < 0)
+			event_listString=[event_listString;{'Event monitor was not saved to file.'}];
+			event_listString=[event_listString;{'Try again with a valid path and filename.'}];
+			event_listString=[event_listString;{'______________________________________________________________________'}];
+		else
+			event_listString=[event_listString;{['Event monitor was saved to ',pathName,'\',fileName]}];
+			event_listString=[event_listString;{'______________________________________________________________________'}];
+			fprintf(fid,'%s\n',char(['rsaToolbox v2.0.1 by Stefan M. Schulz <schulz@psychologie.uni-wuerzburg.de> - event monitor output']));
+			global infantOption;
+			if infantOption==1
+				fprintf(fid,'%s\n',char(['Note: infant option is',char(9),'on']));
+			else
+				  fprintf(fid,'%s\n',char(['Note: infant option is',char(9),'off']));
+			end;
+			for i=1:length(event_listString(:,1))
+				fprintf(fid,'%s\n',char(event_listString(i,:)));
+			end;
+		end;
+		fclose(fid);
+	end;
+	set(handles.event_list,'String',event_listString);
+	sTemp=size(event_listString);
+	set(handles.event_list,'Value',sTemp(1,1));
+	guidata(hObject,handles);
+
+
+% --- Executes on button press in saveExpRsa_button.
+function saveExpRsa_button_Callback(hObject, eventdata, handles)
+% hObject	handle to saveExpRsa_button (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles	structure with handles and user data (see GUIDATA)
+	[fileName,pathName] = uiputfile({'*.txt','tab-delimited ASCII file (*.txt)'},['Save RSA of experimental data to...']);
+	event_listString=get(handles.event_list,'String');
+	IBIdiffExpF=handles.saveExpRsa_button_Callback;
+	sTemp=size(IBIdiffExpF);
+	if sTemp(1,2)>0
+		fid = fopen([pathName,'\',fileName,'.txt'],'wt');
+		if (fid < 0)
+			event_listString=[event_listString;{'RSA computed for experimental recordings was not saved to file.'}];
+			event_listString=[event_listString;{'Try again with a valid path and filename.'}];
+			event_listString=[event_listString;{'______________________________________________________________________'}];
+			return
+		else
+			fprintf(fid,'%s\n',char('rsaToolbox v2.0.1 by Stefan M. Schulz <schulz@psychologie.uni-wuerzburg.de> - RSA data output - one column per data set'));
+			global infantOption;
+			if infantOption==1
+				fprintf(fid,'%s\n',char(['Note: infant option is',char(9),'on']));
+			else
+				  fprintf(fid,'%s\n',char(['Note: infant option is',char(9),'off']));
+			end;
+			for recNo=1:sTemp(1,2)
+				fprintf(fid,'%s\t',char(['dataSet_',num2str(recNo)]));
+			end;
+			fprintf(fid,'\n');
+			for recNo=1:sTemp(1,1)
+				fprintf(fid,'%d\t',IBIdiffExpF(recNo,:));
+				fprintf(fid,'\n');
+			end;
+			event_listString=[event_listString;{['RSA computed for experimental recordings was saved to ',pathName,'\',fileName]}];
+			event_listString=[event_listString;{'______________________________________________________________________'}];
+		end;
+		fclose(fid);
+	else
+		event_listString=[event_listString;{'RSA computed for experimental recordings was not saved to file.'}];
+		event_listString=[event_listString;{'Try again with valid data.'}];
+		event_listString=[event_listString;{'______________________________________________________________________'}];
+	end;
+	set(handles.event_list,'String',event_listString);
+	sTemp=size(event_listString);
+	set(handles.event_list,'Value',sTemp(1,1));
+	guidata(hObject,handles);
+
+% --- Executes on button press in saveExpRSAByVt_button.
+function saveExpRsaByVt_button_Callback(hObject, eventdata, handles)
+% hObject	handle to saveExpRSAByVt_button (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles	structure with handles and user data (see GUIDATA)
+	[fileName,pathName] = uiputfile({'*.txt','tab-delimited ASCII file (*.txt)'},['Save RSA/VT of experimental data to...']);
+	event_listString=get(handles.event_list,'String');
+	experimentalRV=handles.saveExpRSAByVt_button_Callback;
+	sTemp=size(experimentalRV);
+	if sTemp(1,2)>0
+		fid = fopen([pathName,'\',fileName,'.txt'],'wt');
+		if (fid < 0)
+			event_listString=[event_listString;{'RSA/VT computed for experimental recordings was not saved to file.'}];
+			event_listString=[event_listString;{'Try again with a valid path and filename.'}];
+			event_listString=[event_listString;{'______________________________________________________________________'}];
+			return
+		else
+			fprintf(fid,'%s\n',char('rsaToolbox v2.0.1 by Stefan M. Schulz <schulz@psychologie.uni-wuerzburg.de> - RSA/VT data output - one column per data set'));
+			global infantOption;
+			if infantOption==1
+				 fprintf(fid,'%s\n',char(['Note: infant option is',char(9),'on']));
+			else
+				   fprintf(fid,'%s\n',char(['Note: infant option is',char(9),'off']));
+			end;
+			for recNo=1:sTemp(1,2)
+				fprintf(fid,'%s\t',char(['dataSet_',num2str(recNo)]));
+			end;
+			fprintf(fid,'\n');
+			for recNo=1:sTemp(1,1)
+				fprintf(fid,'%d\t',experimentalRV(recNo,:));
+				fprintf(fid,'\n');
+			end;
+			event_listString=[event_listString;{['RSA/VT computed for experimental recordings was saved to ',pathName,'\',fileName]}];
+			event_listString=[event_listString;{'______________________________________________________________________'}];
+		end;
+		fclose(fid);
+	else
+		event_listString=[event_listString;{'RSA/VT computed for experimental recordings was not saved to file.'}];
+		event_listString=[event_listString;{'Try again with valid data.'}];
+		event_listString=[event_listString;{'______________________________________________________________________'}];
+	end;
+	set(handles.event_list,'String',event_listString);
+	sTemp=size(event_listString);
+	set(handles.event_list,'Value',sTemp(1,1));
+	guidata(hObject,handles);
+
+% --- Executes on button press in saveExpTTOTcorrRsaByVt_button.
+function saveExpTtotCorrRsaByVt_button_Callback(hObject, eventdata, handles)
+% hObject	handle to saveExpTTOTcorrRsaByVt_button (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles	structure with handles and user data (see GUIDATA)
+	[fileName,pathName] = uiputfile({'*.txt','tab-delimited ASCII file (*.txt)'},['Save TTOT-corrected RSA/VT of experimental data to...']);
+	event_listString=get(handles.event_list,'String');
+	experimentalRVDif=handles.saveExpTTOTcorrRsaByVt_button_Callback;
+	sTemp=size(experimentalRVDif);
+	if sTemp(1,2)>0
+		fid = fopen([pathName,'\',fileName,'.txt'],'wt');
+		if (fid < 0)
+			event_listString=[event_listString;{'TTOT-corrected RSA/VT computed for experimental recordings was not saved to file.'}];
+			event_listString=[event_listString;{'Try again with a valid path and filename.'}];
+			event_listString=[event_listString;{'______________________________________________________________________'}];
+			return
+		else
+			fprintf(fid,'%s\n',char('rsaToolbox v2.0.1 by Stefan M. Schulz <schulz@psychologie.uni-wuerzburg.de> - TTOT-corrected RSA/VT data output - one column per data set'));
+			global infantOption;
+			if infantOption==1
+				   fprintf(fid,'%s\n',char(['Note: infant option is',char(9),'on']));
+			else
+				   fprintf(fid,'%s\n',char(['Note: infant option is',char(9),'off']));
+			end;
+			for recNo=1:sTemp(1,2)
+				fprintf(fid,'%s\t',char(['dataSet_',num2str(recNo)]));
+			end;
+			fprintf(fid,'\n');
+			for recNo=1:sTemp(1,1)
+				fprintf(fid,'%d\t',experimentalRVDif(recNo,:));
+				fprintf(fid,'\n');
+			end;
+			event_listString=[event_listString;{['TTOT-corrected RSA/VT computed for experimental recordings was saved to ',pathName,'\',fileName]}];
+			event_listString=[event_listString;{'______________________________________________________________________'}];
+		end;
+		fclose(fid);
+	else
+		event_listString=[event_listString;{'TTOT-corrected RSA/VT computed for experimental recordings was not saved to file.'}];
+		event_listString=[event_listString;{'Try again with valid data.'}];
+		event_listString=[event_listString;{'______________________________________________________________________'}];
+	end;
+	set(handles.event_list,'String',event_listString);
+	sTemp=size(event_listString);
+	set(handles.event_list,'Value',sTemp(1,1));
+	guidata(hObject,handles);
+
+
+%==========================================================================
+% --------------------------------------------------------------------
+function Batch_Modes_Callback(hObject, eventdata, handles)
+% hObject	handle to Batch_Modes (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles	structure with handles and user data (see GUIDATA)
+
+% --------------------------------------------------------------------
+function Compute_simple_RSA_Callback(hObject, eventdata, handles)
+% hObject	handle to Compute_simple_RSA (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles	structure with handles and user data (see GUIDATA)
+	event_listString=get(handles.event_list,'String');
+	cal_button_clear_Callback(hObject, eventdata, handles);
+	exp_buttton_clear_Callback(hObject, eventdata, handles);
+	event_listString=get(handles.event_list,'String');
+	[batchListExp,batchDirExp,event_listString,cancelFlag]=rsaBatchLoad(event_listString);
+	set(handles.event_list,'String',event_listString);
+	sTemp=size(event_listString);
+	set(handles.event_list,'Value',sTemp(1,1));
+	guidata(hObject,handles);
+	[d,e]=size(batchListExp);
+	if cancelFlag==0
+		global expertMode;
+		if expertMode==1
+			PVC=menu('Choose peak valley criterion:','1 - keep only data meeting most conservative criterion','2 - keep only data meeting most conservative and most lenient criterion (recommended for calibration)','3 - keep all data regardless of peak-valley criterion','4 - set all data not meeting the most conservative criterion to zero','5 - set data not meeting conservative PVC to zero and breath with < 2 IBI to missing  (default, when applying calibration or computing simple RSA and RSA/Vt as of May 6, 2014)');
+		else
+			PVC=5;
+		end;
+
+		for j=1:d
+			%do sequentially for each set of files in exp
+			event_listString=get(handles.event_list,'String');
+			tmpBatchFilename=getfield(batchListExp(j,1),'name');
+			tmpBatchFileSavename=tmpBatchFilename(1:end-9);
+			noOfFilenameElements=0;
+			global splitFilename;
+			global answer;
+			switch splitFilename
+				case 0
+				case 1
+					aC=find(~isstrprop(tmpBatchFileSavename,'alphanum'));
+					bC=aC(1,find(diff(find(~isstrprop(tmpBatchFileSavename,'alphanum')))==1));
+					if ~isempty(bC)
+						tmpBatchFileSavename(bC)=[];
+					end;
+					noOfFilenameElements=length(find(~isstrprop(tmpBatchFileSavename,'alphanum')));
+					tmpBatchFileSavenamePrint=tmpBatchFileSavename;
+					tmpBatchFileSavenamePrint(~isstrprop(tmpBatchFileSavename,'alphanum'))=char(9);
+				case 2
+					aC=find(ismember(tmpBatchFileSavename,char(answer)));
+					bC=aC(1,find(diff(find(ismember(tmpBatchFileSavename,char(answer))))==1));
+					if ~isempty(bC)
+						tmpBatchFileSavename(bC)=[];
+					end;
+					noOfFilenameElements=length(find(ismember(tmpBatchFileSavename,char(answer))));
+					tmpBatchFileSavenamePrint=tmpBatchFileSavename;
+					tmpBatchFileSavenamePrint(ismember(tmpBatchFileSavename,char(answer)))=char(9);
+			end;
+			tmpBatchFilename = fullfile(batchDirExp,tmpBatchFilename);
+			tmpBatchFilePrefix=tmpBatchFilename(1:end-9);
+			TTOTExp{1,1}=importdata([tmpBatchFilePrefix,'_TTOT.csv']);
+			VTExp{1,1}=importdata([tmpBatchFilePrefix,'_VT.csv']);
+			IBIExp{1,1}=importdata([tmpBatchFilePrefix,'_IBI.csv']);
+			%check for flag data
+			if ~isempty(dir([tmpBatchFilePrefix,'_TTOTflag.csv']))
+				   flagTTOTExp{1,1}=importdata([tmpBatchFilePrefix,'_TTOTflag.csv']);
+			else
+				flagTTOTExp{1,1}=([1:length(TTOTExp{1,1}-1)]*0)';
+			end;
+			if ~isempty(dir([tmpBatchFilePrefix,'_IBIflag.csv']))
+				flagIBIExp{1,1}=importdata([tmpBatchFilePrefix,'_IBIflag.csv']);
+			else
+				flagIBIExp{1,1}=([1:length(IBIExp{1,1}-1)]*0)';
+			end;
+			event_listString=[event_listString;{'BATCH-MODE: Raw data successfully loaded.'}];
+			set(handles.event_list,'String',event_listString);
+			sTemp=size(event_listString);
+			set(handles.event_list,'Value',sTemp(1,1));
+			global infantOption;
+			[IBInoExp,IBImeanExp,IBIminExp,IBImaxExp,IBIdiffExp,IBIdiffTypeExp,HRperBreathExp,IBIcountExp]=rsaPeakValleyWindowed(TTOTExp,IBIExp,0,0,flagIBIExp,infantOption);
+			[experimentalTTOTF,experimentalVTF,IBIcountExpF,IBImeanExpF,IBIminExpF,IBImaxExpF,IBIdiffExpF,expFlag,PVCfailExpF,notEnoughIBIExpF,HRperBreathExpF,IBInoExpF]=rsaClearFlag(TTOTExp,VTExp,IBImeanExp,IBIminExp,IBImaxExp,IBIdiffExp,IBIdiffTypeExp,flagTTOTExp,IBInoExp,PVC);
+			for n=1:length(expFlag(1,:))
+				event_listString=[event_listString;{['BATCH-MODE: Peak valley criterion not met in ',num2str(PVCfailExpF(n)),' of ',num2str(length(find(flagTTOTExp{n}==0))),' valid breathing cycles in recording ',tmpBatchFileSavename]}];
+			end;
+			if PVC==1 | PVC==2
+				event_listString=[event_listString;{'Note: RSA obtained in these breaths is excluded rather than set to zero!'}];
+			elseif PVC==3
+				event_listString=[event_listString;{'Note: Scores obtained in these breaths may not be a valid index of RSA!'}];
+			elseif PVC==4
+				event_listString=[event_listString;{'Note: RSA scores for these breaths are set to zero (see Grossman & Wientjes, 1986)!'}];
+			elseif PVC==5
+				event_listString=[event_listString;{'Note: RSA scores for these breaths are set to zero (see Grossman & Wientjes, 1986)!'}];
+			end;
+			[experimentalRV,experimentalRVMean]=rsaNormalizeByVt(experimentalVTF,IBIdiffExpF);
+
+			%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+			tempVT=VTExp{1,1};
+			tempTTOT=TTOTExp{1,1};
+			tempRV=IBIdiffExp./tempVT;
+			sTemp=size(IBIdiffExpF);
+			global infantOption;
+
+			fid = fopen('outputPerInputFilePerBreath.txt','at');
+			if j == 1
+				fprintf(fid,'%s\n',char(['rsaToolbox v2.0.1 by Stefan M. Schulz <schulz@psychologie.uni-wuerzburg.de> - Analysis:',char(9),datestr(now)]));
+				fprintf(fid,'%s\t',char(['RSA']));
+				fprintf(fid,'%s\t',char(['RSA/VT']));
+				fprintf(fid,'%s\t',char(['TTOT']));
+				fprintf(fid,'%s\t',char(['VT']));
+				fprintf(fid,'%s\t',char(['HR']));
+				fprintf(fid,'%s\t',char(['Flag']));
+				fprintf(fid,'%s\t',char(['noOfIBI']));
+				fprintf(fid,'\n');
+			end;
+			global infantOption;
+			if infantOption==1
+				fprintf(fid,'%s\n',char(['Note: infant option is',char(9),'on']));
+			else
+				fprintf(fid,'%s\n',char(['Note: infant option is',char(9),'off']));
+			end;
+			fprintf(fid,'%s\n',char(['PVC criterion:',char(9),num2str(PVC)]));
+			fprintf(fid,'%s\n',char(['data folder:',char(9),batchDirExp]));
+			fprintf(fid,'%s\n',char(['dataset:',char(9),tmpBatchFileSavename]));
+			tempDataOutput=[IBIdiffExpF,experimentalRV,experimentalTTOTF,experimentalVTF,HRperBreathExpF,expFlag,IBInoExpF];
+			for x=1:length(IBIdiffExpF)
+				fprintf(fid,'%d\t',tempDataOutput(x,:));
+				fprintf(fid,'\n');
+			end;
+			fclose(fid);
+
+			event_listString=[event_listString;{['BATCH-MODE: Output per breath saved to ',pwd,'\outputPerInputFilePerBreath.txt']}];
+			set(handles.event_list,'String',event_listString);
+			sTemp=size(event_listString);
+			set(handles.event_list,'Value',sTemp(1,1));
+
+			fid = fopen('overviewPerInputFile.txt','at');
+			if j == 1
+				fprintf(fid,'%s\n',char(['rsaToolbox v2.0.1 by Stefan M. Schulz <schulz@psychologie.uni-wuerzburg.de> - Analysis: ',datestr(now)]));
+				fprintf(fid,'%s\t','data folder');
+				fprintf(fid,'%s\t','dataset');
+				if noOfFilenameElements>0
+					for nFilenameElements=1:noOfFilenameElements+1
+						fprintf(fid,'%s\t',['filename part ',num2str(nFilenameElements)]);
+					end;
+				end;
+				fprintf(fid,'%s\t','quality criteria (code: see documentation)');
+				fprintf(fid,'%s\t','infant option (1 = on)');
+
+				fprintf(fid,'%s\t','number of breaths (nob)');
+				fprintf(fid,'%s\t','nob - meeting flag');
+				fprintf(fid,'%s\t','nob - not enough IBI');
+				fprintf(fid,'%s\t','nob - failed applied PVC');
+				fprintf(fid,'%s\t','nob - failed lenient PVC');
+				fprintf(fid,'%s\t','nob - excluded via flag (i.e. artifact)');
+
+%			   fprintf(fid,'%s\t','mean RSA [ms] - all breaths');
+%			   fprintf(fid,'%s\t','mean RSA/VT [ms/l] - all breaths');
+%			   fprintf(fid,'%s\t','mean VT [l] - all breaths');
+%			   fprintf(fid,'%s\t','mean TTOT [s] - all breaths');
+%			   fprintf(fid,'%s\t','mean HR [bpm] - all breaths');
+%			   fprintf(fid,'%s\t','min RSA [ms] - all breaths');
+%			   fprintf(fid,'%s\t','max RSA [ms] - all breaths');
+
+				fprintf(fid,'%s\t','mean RSA [ms] - meeting quality criteria');
+				fprintf(fid,'%s\t','mean RSA/VT [ms/l] - meeting quality criteria');
+				fprintf(fid,'%s\t','mean VT [l] - meeting quality criteria');
+				fprintf(fid,'%s\t','mean TTOT [s] - meeting quality criteria');
+				fprintf(fid,'%s\t','mean HR [bpm] - meeting quality criteria');
+				fprintf(fid,'%s\t','min RSA [ms] - meeting quality criteria');
+				fprintf(fid,'%s\t','max RSA [ms] - meeting quality criteria');
+
+				fprintf(fid,'%s\t','mean RSA [ms] - not enough IBI');
+				fprintf(fid,'%s\t','mean RSA/VT [ms/l] - not enough IBI');
+				fprintf(fid,'%s\t','mean VT [l] - not enough IBI');
+				fprintf(fid,'%s\t','mean TTOT [s] - not enough IBI');
+				fprintf(fid,'%s\t','mean HR [bpm] - not enough IBI');
+				fprintf(fid,'%s\t','min RSA [ms] - not enough IBI');
+				fprintf(fid,'%s\t','max RSA [ms] - not enough IBI');
+
+				fprintf(fid,'%s\t','mean RSA [ms] - failed applied PVC');
+				fprintf(fid,'%s\t','mean RSA/VT [ms/l] - failed applied PVC');
+				fprintf(fid,'%s\t','mean VT [l] - failed applied PVC');
+				fprintf(fid,'%s\t','mean TTOT [s] - failed applied PVC');
+				fprintf(fid,'%s\t','mean HR [bpm] - failed applied PVC');
+				fprintf(fid,'%s\t','min RSA [ms] - failed applied PVC');
+				fprintf(fid,'%s\t','max RSA [ms] - failed applied PVC');
+
+				fprintf(fid,'\n');
+			end;
+			fprintf(fid,'%s\t',batchDirExp);
+			fprintf(fid,'%s\t',tmpBatchFileSavename);
+			if noOfFilenameElements>0
+				fprintf(fid,'%s\t',tmpBatchFileSavenamePrint);
+			end;
+			fprintf(fid,'%s\t',num2str(PVC)); %flag defining criterion set applied in rsaClearFlag
+			if infantOption==1
+				fprintf(fid,'%s\t','1'); %flag indicating whether infantOption was turned on (=1) or off (=0)
+			else
+				fprintf(fid,'%s\t','0'); %flag indicating whether infantOption was turned on (=1) or off (=0)
+			end;
+			fprintf(fid,'%s\t',num2str(IBIcountExp));%all
+			fprintf(fid,'%s\t',num2str(IBIcountExpF));%meeting all quality criteria applied by rsaClearFlag
+			fprintf(fid,'%s\t',num2str(notEnoughIBIExpF));%not enough IBI
+			fprintf(fid,'%s\t',num2str(PVCfailExpF));%enough IBI but failed peak valley criterion set in rsaClearFlag (may be the same as the following!)
+			fprintf(fid,'%s\t',num2str(length(find(IBIdiffTypeExp==2 | IBIdiffTypeExp==6))));%enough IBI but failed lenient peak valley criterion
+			fprintf(fid,'%s\t',num2str(length(find(flagTTOTExp{1,1}==1))));%excluded via data flag (typically indicating an artifact)
+
+%		   fprintf(fid,'%s\t',num2str(rsaNanmean(IBIdiffExp)));%mean RSA all
+%		   fprintf(fid,'%s\t',num2str(rsaNanmean(IBIdiffExp)/rsaNanmean(tempVT)));%mean RV all
+%		   fprintf(fid,'%s\t',num2str(rsaNanmean(tempVT)));%mean VT all
+%		   fprintf(fid,'%s\t',num2str(rsaNanmean(tempTTOT)));%mean TTOT all
+%		   fprintf(fid,'%s\t',num2str(rsaNanmean(HRperBreathExp)));%mean heart rate all
+%		   nans=isnan(IBIminExp);
+%		   iNans=find(nans);
+%		   tempIBIminExp=IBIminExp;
+%		   tempIBIminExp(iNans)=Inf;
+%		   fprintf(fid,'%s\t',num2str(min(tempIBIminExp)));%min RSA all
+%		   nans=isnan(IBImaxExp);
+%		   iNans=find(nans);
+%		   tempIBImaxExp=IBImaxExp;
+%		   tempIBImaxExp(iNans)=zeros(size(iNans));
+%		   fprintf(fid,'%s\t',num2str(max(tempIBImaxExp)));%max RSA all
+
+			fprintf(fid,'%s\t',num2str(rsaNanmean(IBIdiffExpF)));%mean RSA meeting all quality criteria applied by rsaClearFlag
+			fprintf(fid,'%s\t',num2str(experimentalRVMean));%mean RV meeting all quality criteria applied by rsaClearFlag
+			fprintf(fid,'%s\t',num2str(rsaNanmean(experimentalVTF)));%mean VT meeting all quality criteria applied by rsaClearFlag
+			fprintf(fid,'%s\t',num2str(rsaNanmean(experimentalTTOTF)));%mean TTOT meeting all quality criteria applied by rsaClearFlag
+			fprintf(fid,'%3.2f\t',rsaNanmean(HRperBreathExpF));%mean heart rate meeting all quality criteria applied by rsaClearFlag
+			nans=isnan(IBIminExpF);
+			iNans=find(nans);
+			tempIBIminExpF=IBIminExpF;
+			if ~isempty(iNans)
+				tempIBIminExpF(iNans)=Inf;
+			end;
+			if isempty(min(tempIBIminExpF))
+				fprintf(fid,'%s\t','NaN');%min RSA meeting all quality criteria applied by rsaClearFlag
+			else
+				fprintf(fid,'%s\t',num2str(min(tempIBIminExpF)));%min RSA meeting all quality criteria applied by rsaClearFlag
+			end;
+			nans=isnan(IBImaxExpF);
+			iNans=find(nans);
+			tempIBImaxExpF=IBImaxExpF;
+			if ~isempty(iNans)
+				tempIBImaxExpF(iNans)=zeros(size(iNans));
+			end;
+			if isempty(max(tempIBImaxExpF))
+				fprintf(fid,'%s\t','NaN');%min RSA meeting all quality criteria applied by rsaClearFlag
+			else
+				fprintf(fid,'%s\t',num2str(max(tempIBImaxExpF)));%max RSA meeting all quality criteria applied by rsaClearFlag
+			end;
+
+			tempSearchCriterion=find(IBIdiffTypeExp==3);
+			if ~isempty(tempSearchCriterion)
+				fprintf(fid,'%s\t',num2str(rsaNanmean(IBIdiffExp(find(IBIdiffTypeExp==3),1))));%mean RSA not enough IBI
+				fprintf(fid,'%s\t',num2str(rsaNanmean(tempRV(find(IBIdiffTypeExp==3),1))));%mean RV not enough IBI
+%			   fprintf(fid,'%s\t',num2str(rsaNanmean(experimentalRVDif(find(IBIdiffTypeExp==3),1))));%mean TTOT corrected RV not enough IBI
+				fprintf(fid,'%s\t',num2str(rsaNanmean(tempVT(find(IBIdiffTypeExp==3),1))));%mean VT not enough IBI
+				fprintf(fid,'%s\t',num2str(rsaNanmean(tempTTOT(find(IBIdiffTypeExp==3),1))));%mean TTOT not enough IBI
+				fprintf(fid,'%3.2f\t',rsaNanmean(HRperBreathExp(find(IBIdiffTypeExp==3),1)));%mean heart rate not enough IBI
+				nans=isnan(IBIminExp);
+				iNans=find(nans);
+				tempIBIminExp=IBIminExp;
+				if ~isempty(iNans)
+					tempIBIminExp(iNans)=Inf;
+				end;
+				if isempty(min(tempIBIminExp(find(IBIdiffTypeExp==3),1)))
+					fprintf(fid,'%s\t','NaN');%min RSA meeting all quality criteria applied by rsaClearFlag
+				else
+					fprintf(fid,'%s\t',num2str(min(tempIBIminExp(find(IBIdiffTypeExp==3),1))));%min RSA not enough IBI
+				end;
+				nans=isnan(IBImaxExp);
+				iNans=find(nans);
+				tempIBImaxExp=IBImaxExp;
+				if ~isempty(iNans)
+					tempIBImaxExp(iNans)=zeros(size(iNans));
+				end;
+				if isempty(max(tempIBImaxExp(find(IBIdiffTypeExp==3),1)))
+					fprintf(fid,'%s\t','NaN');%min RSA meeting all quality criteria applied by rsaClearFlag
+				else
+					fprintf(fid,'%s\t',num2str(max(tempIBImaxExp(find(IBIdiffTypeExp==3),1))));%max RSA not enough IBI
+				end;
+			 else
+				fprintf(fid,'%s\t','NaN');
+				fprintf(fid,'%s\t','NaN');
+%			   fprintf(fid,'%s\t','NaN');
+				fprintf(fid,'%s\t','NaN');
+				fprintf(fid,'%s\t','NaN');
+				fprintf(fid,'%s\t','NaN');
+				fprintf(fid,'%s\t','NaN');
+				fprintf(fid,'%s\t','NaN');
+			 end;
+
+			 tempSearchCriterion=find(IBIdiffTypeExp==4 | IBIdiffTypeExp==8);
+			 if ~isempty(tempSearchCriterion)
+				fprintf(fid,'%s\t',num2str(rsaNanmean(IBIdiffExp(find(IBIdiffTypeExp==4 | IBIdiffTypeExp==8),1))));%mean RSA enough IBI but failed peak valley criterion applied in rsaClearFlag
+				fprintf(fid,'%s\t',num2str(rsaNanmean(tempRV(find(IBIdiffTypeExp==4 | IBIdiffTypeExp==8),1))));%mean RV enough IBI but failed peak valley criterion applied in rsaClearFlag
+%			   fprintf(fid,'%s\t',num2str(rsaNanmean(experimentalRVDif(find(IBIdiffTypeExp==4 | IBIdiffTypeExp==8),1))));%mean TTOT corrected RV enough IBI but failed peak valley criterion applied in rsaClearFlag
+				fprintf(fid,'%s\t',num2str(rsaNanmean(tempVT(find(IBIdiffTypeExp==4 | IBIdiffTypeExp==8),1))));%mean VT enough IBI but failed peak valley criterion applied in rsaClearFlag
+				fprintf(fid,'%s\t',num2str(rsaNanmean(tempTTOT(find(IBIdiffTypeExp==4 | IBIdiffTypeExp==8),1))));%mean TTOT enough IBI but failed peak valley criterion applied in rsaClearFlag
+				fprintf(fid,'%3.2f\t',rsaNanmean(HRperBreathExp(find(IBIdiffTypeExp==4 | IBIdiffTypeExp==8),1)));%mean heart rate enough IBI but failed peak valley criterion applied in rsaClearFlag
+				nans=isnan(IBIminExp);
+				iNans=find(nans);
+				tempIBIminExp=IBIminExp;
+				if ~isempty(iNans)
+					tempIBIminExp(iNans)=Inf;
+				end;
+				if isempty(min(tempIBIminExp(find(IBIdiffTypeExp==4 | IBIdiffTypeExp==8),1)))
+					fprintf(fid,'%s\t','NaN');%min RSA meeting all quality criteria applied by rsaClearFlag
+				else
+					fprintf(fid,'%s\t',num2str(min(tempIBIminExp(find(IBIdiffTypeExp==4 | IBIdiffTypeExp==8),1))));%min RSA enough IBI but failed peak valley criterion applied in rsaClearFlag
+				end;
+				nans=isnan(IBImaxExp);
+				iNans=find(nans);
+				tempIBImaxExp=IBImaxExp;
+				if ~isempty(iNans)
+					tempIBImaxExp(iNans)=zeros(size(iNans));
+				end;
+				if isempty(max(tempIBImaxExp(find(IBIdiffTypeExp==4 | IBIdiffTypeExp==8),1)))
+					fprintf(fid,'%s\t','NaN');%min RSA meeting all quality criteria applied by rsaClearFlag
+				else
+					fprintf(fid,'%s\t',num2str(max(tempIBImaxExp(find(IBIdiffTypeExp==4 | IBIdiffTypeExp==8),1))));%max RSA enough IBI but failed peak valley criterion applied in rsaClearFlag
+				end;
+			 else
+				 fprintf(fid,'%s\t','NaN');
+				 fprintf(fid,'%s\t','NaN');
+%				fprintf(fid,'%s\t','NaN');
+				 fprintf(fid,'%s\t','NaN');
+				 fprintf(fid,'%s\t','NaN');
+				 fprintf(fid,'%s\t','NaN');
+				 fprintf(fid,'%s\t','NaN');
+				 fprintf(fid,'%s\t','NaN');
+			 end;
+			 fprintf(fid,'\n');
+			 fclose(fid);
+		end;
+
+		global infantOption;
+		if infantOption==1
+			event_listString=[event_listString;{'Note: infant option is on.'}];
+		else
+			event_listString=[event_listString;{'Note: infant option is off.'}];
+		end;
+		event_listString=[event_listString;{'BATCH-MODE: Compute RSA and RSA/VT completed.'}];
+		event_listString=[event_listString;{'______________________________________________________________________'}];
+		set(handles.event_list,'String',event_listString);
+		sTemp=size(event_listString);
+		set(handles.event_list,'Value',sTemp(1,1));
+	end;
+
+
+% --------------------------------------------------------------------
+function Compute_intercept_and_B_Callback(hObject, eventdata, handles)
+% hObject	handle to Untitled_3Compute_intercept_and_B (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles	structure with handles and user data (see GUIDATA)
+	event_listString=get(handles.event_list,'String');
+	cal_button_clear_Callback(hObject, eventdata, handles);
+	exp_buttton_clear_Callback(hObject, eventdata, handles);
+	[batchListCal,batchDirCal,event_listString,cancelFlag]=rsaBatchLoad(event_listString);
+	set(handles.event_list,'String',event_listString);
+	sTemp=size(event_listString);
+	set(handles.event_list,'Value',sTemp(1,1));
+	guidata(hObject,handles);
+	[b,a]=size(batchListCal);
+	if cancelFlag==0
+		%load all cal data and use for correction
+		event_listString=get(handles.event_list,'String');
+
+		loadedData=[];
+		for i=1:b
+			tmpBatchFilename=getfield(batchListCal(i,1),'name');
+			tmpBatchFileSavename{1,i}=tmpBatchFilename(1:end-9);
+			tmpBatchFilename = fullfile(batchDirCal,tmpBatchFilename);
+			tmpBatchFilePrefix=tmpBatchFilename(1:end-9);
+			loadedDataTTOT{1,1}=importdata([tmpBatchFilePrefix,'_TTOT.csv']);
+			loadedDataVT{1,1}=importdata([tmpBatchFilePrefix,'_VT.csv']);
+			loadedDataIBI{1,1}=importdata([tmpBatchFilePrefix,'_IBI.csv']);
+			%check for flag data
+			if ~isempty(dir([tmpBatchFilePrefix,'_TTOTflag.csv']))
+				loadedDataFlagTTOT{1,1}=importdata([tmpBatchFilePrefix,'_TTOTflag.csv']);
+			else
+				loadedDataFlagTTOT{1,1}=([1:length(loadedDataTTOT{1,1}-1)]*0)';
+			end;
+			if ~isempty(dir([tmpBatchFilePrefix,'_IBIflag.csv']))
+				loadedDataFlagIBI{1,1}=importdata([tmpBatchFilePrefix,'_IBIflag.csv']);
+			else
+				loadedDataFlagIBI{1,1}=([1:length(loadedDataIBI{1,1}-1)]*0)';
+			end;
+			tempLoadedData=[loadedDataTTOT;loadedDataVT;loadedDataIBI;loadedDataFlagTTOT;loadedDataFlagIBI];
+			loadedData=cat(2,loadedData,tempLoadedData);
+		end;
+		event_listString=[event_listString;{'BATCH-MODE: Raw paced breathing data successfully loaded.'}];
+		set(handles.event_list,'String',event_listString);
+		sTemp=size(event_listString);
+		set(handles.event_list,'Value',sTemp(1,1));
+		guidata(hObject,handles);
+		TTOT=loadedData(1,:);
+		IBI=loadedData(3,:);
+		flagIBI=loadedData(5,:);
+		VT=loadedData(2,:);
+		flagTTOT=loadedData(4,:);
+		global infantOption;
+		[IBInoCal,IBImeanCal,IBIminCal,IBImaxCal,IBIdiffCal,IBIdiffTypeCal,HRperBreathCal,IBIcountCal]=rsaPeakValleyWindowed(TTOT,IBI,0,0,flagIBI,infantOption);
+		global expertMode;
+		if expertMode==1
+			PVC=menu('Choose peak valley criterion:','1 - keep only data meeting most conservative criterion','2 - keep only data meeting most conservative and most lenient criterion (recommended for calibration)','3 - keep all data regardless of peak-valley criterion','4 - set all data not meeting the most conservative criterion to zero (default, see Grossman & Wientjes, 1986 - used when applying calibration)');
+		else
+			PVC=2;
+		end;
+		[calibrationTTOTF,calibrationVTF,IBIcountCalF,IBImeanCalF,IBIminCalF,IBImaxCalF,IBIdiffCalF,calFlag,PVCfailCalF,notEnoughIBICalF,HRperBreathCalF,IBInoCalF]=rsaClearFlag(TTOT,VT,IBImeanCal,IBIminCal,IBImaxCal,IBIdiffCal,IBIdiffTypeCal,flagTTOT,IBInoCal,PVC);
+		for n=1:length(calFlag(1,:))
+			event_listString=[event_listString;{['BATCH-MODE: Peak valley criterion not met in ',num2str(PVCfailCalF(n)),' of ',num2str(length(find(flagTTOT{n}==0))),' valid breathing cycles in recording ',tmpBatchFileSavename{1,n}]}];
+		end;
+		event_listString=[event_listString;{'Note: For the calibration RSA obtained in these breaths is excluded rather than set to zero!'}];
+		[calibrationRV]=rsaNormalizeByVt(calibrationVTF,IBIdiffCalF);
+		global expertMode;
+		if expertMode==1
+			printMethodSelection=menu('Select print output for regression plot:','1 - Do not print figure','2 - Post script file (color -  high quality)','3 - High quality post script file (black/white - high quality - recommended for publications)','4 - Bitmap (color - not recommended)','5 - Bitmap (black/white - not recommended)','6 - JPEG (for email etc. - not recommended for publications','7 - TIFF','8 - Windows Metafile (.emf)');
+		else
+			printMethodSelection=6;
+		end;
+		[intercept,B,df,p,R2]=rsaRegress(calibrationRV,calibrationTTOTF,0,1,printMethodSelection);
+		set(handles.figure_x_axis,'String','TTOT [s]');
+		set(handles.figure_y_axis_left,'String','RSA/VT [ms/l]');
+		set(handles.output_rsa_caption,'String','Regression of paced breathing RSA/VT upon TTOT');
+		B=num2str(B);
+		intercept=num2str(intercept);
+		R2=num2str(R2);
+		df=num2str(df);
+		p=num2str(p);
+		handles.cal_R2=num2str(R2);
+		handles.cal_p=num2str(p);
+		handles.cal_df=num2str(df);
+		set(handles.cal_B,'String',B);
+		set(handles.cal_intercept,'String',intercept);
+		event_listString=[event_listString;{['BATCH-MODE: B=',B,', intercept=',intercept,', R2=',R2,', df=',df,', p=',p]}];
+		set(handles.event_list,'String',event_listString);
+		sTemp=size(event_listString);
+		set(handles.event_list,'Value',sTemp(1,1));
+
+		fid = fopen('regressionParameters.txt','wt');
+		fprintf(fid,'%s\n',char('rsaToolbox v2.0.1 by Stefan M. Schulz <schulz@psychologie.uni-wuerzburg.de> - regression parameters'));
+		global infantOption;
+		if infantOption==1
+			fprintf(fid,'%s\n',char(['Note: infant option is',char(9),'on']));
+		else
+			fprintf(fid,'%s\n',char(['Note: infant option is',char(9),'off']));
+		end;
+		fprintf(fid,'%s\n',char(['PVC criterion:',char(9),num2str(PVC)]));
+		fprintf(fid,'%s\n',char(['data folder:',char(9),batchDirCal]));
+		for recNo=1:sTemp(1,2)
+			fprintf(fid,'%s\t','dataset: ');
+			fprintf(fid,'%s\t',char(tmpBatchFileSavename{1,recNo}));
+		end;
+		fprintf(fid,'\n');
+		fprintf(fid,'%s\n',['intercept',char(9),'uncorrected_B',char(9),'R_squared',char(9),'df',char(9),'p']);
+		fprintf(fid,'%s\n',[char(num2str(intercept)),char(9),char(num2str(B)),char(9),char(num2str(R2)),char(9),char(num2str(df)),char(9),char(num2str(p))]);
+		fclose(fid);
+		event_listString=[event_listString;{['BATCH-MODE: intercept, uncorrected B, R squared, df, p saved to ',[pwd],'\regressionParameters.txt']}];
+		set(handles.event_list,'String',event_listString);
+		sTemp=size(event_listString);
+		set(handles.event_list,'Value',sTemp(1,1));
+
+		fid = fopen('paced_breathing_RSA.txt','wt');
+		sTemp=size(IBIdiffCalF);
+		fprintf(fid,'%s\n',char('rsaToolbox v2.0.1 by Stefan M. Schulz <schulz@psychologie.uni-wuerzburg.de> - paced breathing RSA data output - one column per paced breathing data set'));
+		global infantOption;
+		if infantOption==1
+			fprintf(fid,'%s\n',char(['Note: infant option is',char(9),'on']));
+		else
+			fprintf(fid,'%s\n',char(['Note: infant option is',char(9),'off']));
+		end;
+		fprintf(fid,'%s\n',char(['PVC criterion:',char(9),num2str(PVC)]));
+		fprintf(fid,'%s\n',char(['data folder:',char(9),batchDirCal]));
+		for recNo=1:sTemp(1,2)
+			fprintf(fid,'%s\t',['dataset: ',char(tmpBatchFileSavename{1,recNo})]);
+		end;
+		fprintf(fid,'\n');
+		for recNo=1:sTemp(1,1)
+			fprintf(fid,'%d\t',IBIdiffCalF(recNo,:));
+			fprintf(fid,'\n');
+		end;
+		fclose(fid);
+		event_listString=[event_listString;{['BATCH-MODE: paced breathing RSA saved to ',[pwd],'\paced_breathing_RSA.txt']}];
+		set(handles.event_list,'String',event_listString);
+		sTemp=size(event_listString);
+		set(handles.event_list,'Value',sTemp(1,1));
+
+		fid = fopen('paced_breathing_RSAbyVT.txt','wt');
+		sTemp=size(calibrationRV);
+		fprintf(fid,'%s\n',char('rsaToolbox v2.0.1 by Stefan M. Schulz <schulz@psychologie.uni-wuerzburg.de> - paced breathing RSA/VT data output - one column per paced breathing data set'));
+		global infantOption;
+		if infantOption==1
+			fprintf(fid,'%s\n',char(['Note: infant option is',char(9),'on']));
+		else
+			fprintf(fid,'%s\n',char(['Note: infant option is',char(9),'off']));
+		end;
+		fprintf(fid,'%s\n',char(['PVC criterion:',char(9),num2str(PVC)]));
+		fprintf(fid,'%s\n',char(['data folder:',char(9),batchDirCal]));
+		for recNo=1:sTemp(1,2)
+			fprintf(fid,'%s\t',['dataset: ',char(tmpBatchFileSavename{1,recNo})]);
+		end;
+		fprintf(fid,'\n');
+		for recNo=1:sTemp(1,1)
+			fprintf(fid,'%d\t',calibrationRV(recNo,:));
+			fprintf(fid,'\n');
+		end;
+		fclose(fid);
+		event_listString=[event_listString;{['BATCH-MODE: paced breathing RSA/VT saved to ',[pwd],'\paced_breathing_RSAbyVT.txt']}];
+		set(handles.event_list,'String',event_listString);
+		sTemp=size(event_listString);
+		set(handles.event_list,'Value',sTemp(1,1));
+	end;
+	global infantOption;
+	if infantOption==1
+		 event_listString=[event_listString;{'Note: infant option is on.'}];
+	else
+		 event_listString=[event_listString;{'Note: infant option is off.'}];
+	end;
+	event_listString=[event_listString;{'BATCH-MODE: Estimation procedure completed.'}];
+	event_listString=[event_listString;{'______________________________________________________________________'}];
+	set(handles.event_list,'String',event_listString);
+	sTemp=size(event_listString);
+	set(handles.event_list,'Value',sTemp(1,1));
+	guidata(hObject,handles);
+
+% --------------------------------------------------------------------
+function Apply_intercept_and_B_Callback(hObject, eventdata, handles)
+% hObject	handle to apply_intercept_and_B (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles	structure with handles and user data (see GUIDATA)
+	event_listString=get(handles.event_list,'String');
+	intercept=get(handles.cal_intercept,'String');
+	intercept=str2double(intercept);
+	if isempty(intercept) | isnan(intercept)~=0
+		event_listString=[event_listString;{'Enter intercept or update from paced breathing data.'}];
+		event_listString=[event_listString;{'______________________________________________________________________'}];
+	else
+		B=get(handles.cal_B,'String');
+		B=str2double(B);
+		if isempty(B) | isnan(B)~=0
+			event_listString=[event_listString;{'Enter slope (B) or update from paced breathing data.'}];
+			event_listString=[event_listString;{'______________________________________________________________________'}];
+		else
+			[batchListExp,batchDirExp,event_listString,cancelFlag]=rsaBatchLoad(event_listString);
+			[d,e]=size(batchListExp);
+			if cancelFlag==0
+				global expertMode;
+				if expertMode==1
+        			PVC=menu('Choose peak valley criterion:','1 - keep only data meeting most conservative criterion','2 - keep only data meeting most conservative and most lenient criterion (recommended for calibration)','3 - keep all data regardless of peak-valley criterion','4 - set all data not meeting the most conservative criterion to zero','5 - set data not meeting conservative PVC to zero and breath with < 2 IBI to missing  (default, when applying calibration or computing simple RSA and RSA/Vt as of May 6, 2014)');
+				else
+					PVC=5;
+				end;
+
+				for j=1:d
+					%do sequentially for each set of files in exp
+					event_listString=get(handles.event_list,'String');
+					tmpBatchFilename=getfield(batchListExp(j,1),'name');
+					tmpBatchFileSavename=tmpBatchFilename(1:end-9);
+					noOfFilenameElements=0;
+					global splitFilename;
+					global answer;
+					switch splitFilename
+					case 0
+					case 1
+						aC=find(~isstrprop(tmpBatchFileSavename,'alphanum'));
+						bC=aC(1,find(diff(find(~isstrprop(tmpBatchFileSavename,'alphanum')))==1));
+						if ~isempty(bC)
+							tmpBatchFileSavename(bC)=[];
+						end;
+						noOfFilenameElements=length(find(~isstrprop(tmpBatchFileSavename,'alphanum')));
+						tmpBatchFileSavenamePrint=tmpBatchFileSavename;
+						tmpBatchFileSavenamePrint(~isstrprop(tmpBatchFileSavename,'alphanum'))=char(9);
+					case 2
+						aC=find(ismember(tmpBatchFileSavename,char(answer)));
+						bC=aC(1,find(diff(find(ismember(tmpBatchFileSavename,char(answer))))==1));
+						if ~isempty(bC)
+							tmpBatchFileSavename(bC)=[];
+						end;
+						noOfFilenameElements=length(find(ismember(tmpBatchFileSavename,char(answer))));
+						tmpBatchFileSavenamePrint=tmpBatchFileSavename;
+						tmpBatchFileSavenamePrint(ismember(tmpBatchFileSavename,char(answer)))=char(9);
+					end;
+					tmpBatchFilename = fullfile(batchDirExp,tmpBatchFilename);
+					tmpBatchFilePrefix=tmpBatchFilename(1:end-9);
+					TTOTExp{1,1}=importdata([tmpBatchFilePrefix,'_TTOT.csv']);
+					VTExp{1,1}=importdata([tmpBatchFilePrefix,'_VT.csv']);
+					IBIExp{1,1}=importdata([tmpBatchFilePrefix,'_IBI.csv']);
+					%check for flag data
+					if ~isempty(dir([tmpBatchFilePrefix,'_TTOTflag.csv']))
+						flagTTOTExp{1,1}=importdata([tmpBatchFilePrefix,'_TTOTflag.csv']);
+					else
+						flagTTOTExp{1,1}=([1:length(TTOTExp{1,1}-1)]*0)';
+					end;
+					if ~isempty(dir([tmpBatchFilePrefix,'_IBIflag.csv']))
+					   flagIBIExp{1,1}=importdata([tmpBatchFilePrefix,'_IBIflag.csv']);
+					else
+						flagIBIExp{1,1}=([1:length(IBIExp{1,1}-1)]*0)';
+					end;
+					global infantOption;
+					[IBInoExp,IBImeanExp,IBIminExp,IBImaxExp,IBIdiffExp,IBIdiffTypeExp,HRperBreathExp,IBIcountExp]=rsaPeakValleyWindowed(TTOTExp,IBIExp,0,0,flagIBIExp,infantOption);
+					global expertMode;
+					if expertMode==1
+            			PVC=menu('Choose peak valley criterion:','1 - keep only data meeting most conservative criterion','2 - keep only data meeting most conservative and most lenient criterion (recommended for calibration)','3 - keep all data regardless of peak-valley criterion','4 - set all data not meeting the most conservative criterion to zero','5 - set data not meeting conservative PVC to zero and breath with < 2 IBI to missing  (default, when applying calibration or computing simple RSA and RSA/Vt as of May 6, 2014)');
+					else
+						PVC=5;
+					end;
+					[experimentalTTOTF,experimentalVTF,IBIcountExpF,IBImeanExpF,IBIminExpF,IBImaxExpF,IBIdiffExpF,expFlag,PVCfailExpF,notEnoughIBIExpF,HRperBreathExpF,IBInoExpF]=rsaClearFlag(TTOTExp,VTExp,IBImeanExp,IBIminExp,IBImaxExp,IBIdiffExp,IBIdiffTypeExp,flagTTOTExp,IBInoExp,PVC);
+					for n=1:length(expFlag(1,:))
+						event_listString=[event_listString;{['BATCH-MODE: Peak valley criterion not met in ',num2str(PVCfailExpF(n)),' of ',num2str(length(find(flagTTOTExp{n}==0))),' valid breathing cycles in recording ',tmpBatchFileSavename]}];
+					end;
+					event_listString=[event_listString;{'Note: RSA scores for these breaths is set to zero (see Grossman & Wientjes, 1986)!'}];
+					[experimentalRV,experimentalRVMean]=rsaNormalizeByVt(experimentalVTF,IBIdiffExpF);
+					[experimentalRVPre,experimentalRVPreCutoff,experimentalRVDif,experimentalRVDifCutoff,experimentalTTOTFCutoff,experimentalRVDifMean,experimentalRVDifCutoffMean,experimentalRVExpDifNan]=rsaApplyCal(experimentalTTOTF,experimentalRV,B,intercept,10);
+
+					%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+					tempVT=VTExp{1,1};
+					tempTTOT=TTOTExp{1,1};
+					tempRV=IBIdiffExp./tempVT;
+					sTemp=size(IBIdiffExpF);
+
+					fid = fopen('outputPerInputFilePerBreath_forCorrectedData.txt','at');
+					if j == 1
+						fprintf(fid,'%s\n',char(['rsaToolbox v2.0.1 by Stefan M. Schulz <schulz@psychologie.uni-wuerzburg.de> - Analysis: ',datestr(now)]));
+						fprintf(fid,'%s\t',char(['RSA']));
+						fprintf(fid,'%s\t',char(['RSA/VT']));
+						fprintf(fid,'%s\t',char(['TTOT-corrected RSA/VT']));
+						fprintf(fid,'%s\t',char(['TTOT']));
+						fprintf(fid,'%s\t',char(['VT']));
+						fprintf(fid,'%s\t',char(['HR']));
+						fprintf(fid,'\n');
+					end;
+					global infantOption;
+					if infantOption==1
+						fprintf(fid,'%s\n',char(['Note: infant option is',char(9),'on']));
+					else
+						fprintf(fid,'%s\n',char(['Note: infant option is',char(9),'off']));
+					end;
+					fprintf(fid,'%s\n',char(['PVC criterion:',char(9),num2str(PVC)]));
+					fprintf(fid,'%s\n',char(['data folder:',char(9),batchDirExp]));
+					fprintf(fid,'%s\n',char(['dataset:',char(9),tmpBatchFileSavename]));
+                    if PVC==5
+						tempDataOutput=[IBIdiffExpF,experimentalRV,experimentalRVExpDifNan,experimentalTTOTF,experimentalVTF,HRperBreathExpF];
+					else
+						tempDataOutput=[IBIdiffExpF,experimentalRV,experimentalRVDif,experimentalTTOTF,experimentalVTF,HRperBreathExpF];
+					end;
+					for x=1:length(IBIdiffExpF)
+						fprintf(fid,'%d\t',tempDataOutput(x,:));
+						fprintf(fid,'\n');
+					end;
+					fclose(fid);
+
+					event_listString=[event_listString;{['BATCH-MODE: Output per breath saved to ',pwd,'\outputPerInputFilePerBreath_forCorrectedData.txt']}];
+					set(handles.event_list,'String',event_listString);
+					sTemp=size(event_listString);
+					set(handles.event_list,'Value',sTemp(1,1));
+
+					fid = fopen(['overviewPerInputFile_forCorrectedData.txt'],'at');
+					if j == 1
+						fprintf(fid,'%s\n',char(['rsaToolbox v2.0.1 by Stefan M. Schulz <schulz@psychologie.uni-wuerzburg.de> - Analysis: ',datestr(now)]));
+						global infantOption;
+
+						fprintf(fid,'%s\t','data folder');
+						fprintf(fid,'%s\t','dataset');
+						if noOfFilenameElements>0
+							for nFilenameElements=1:noOfFilenameElements+1
+								fprintf(fid,'%s\t',['filename part ',num2str(nFilenameElements)]);
+							end;
+						end;
+						fprintf(fid,'%s\t','quality criteria (code: see documentation)');
+						fprintf(fid,'%s\t','infant option (1 = on)');
+
+						fprintf(fid,'%s\t','number of breaths (nob)');
+						fprintf(fid,'%s\t','nob - meeting flag');
+						fprintf(fid,'%s\t','nob - not enough IBI');
+						fprintf(fid,'%s\t','nob - failed applied PVC');
+						fprintf(fid,'%s\t','nob - failed lenient PVC');
+						fprintf(fid,'%s\t','nob - excluded via flag (i.e. artifact)');
+
+%					   fprintf(fid,'%s\t','mean RSA [ms] - all breaths');
+%					   fprintf(fid,'%s\t','mean RSA/VT [ms/l] - all breaths');
+%					   fprintf(fid,'%s\t','mean VT [l] - all breaths');
+%					   fprintf(fid,'%s\t','mean TTOT [s] - all breaths');
+%					   fprintf(fid,'%s\t','mean HR [bpm] - all breaths');
+%					   fprintf(fid,'%s\t','min RSA [ms] - all breaths');
+%					   fprintf(fid,'%s\t','max RSA [ms] - all breaths');
+
+						fprintf(fid,'%s\t','mean RSA [ms] - meeting quality criteria');
+						fprintf(fid,'%s\t','mean RSA/VT [ms/l] - meeting quality criteria');
+						fprintf(fid,'%s\t','mean TTOT-corrected RSA/VT [ms/l] - meeting quality criteria');
+						fprintf(fid,'%s\t','mean VT [l] - meeting quality criteria');
+						fprintf(fid,'%s\t','mean TTOT [s] - meeting quality criteria');
+						fprintf(fid,'%s\t','mean HR [bpm] - meeting quality criteria');
+						fprintf(fid,'%s\t','min RSA [ms] - meeting quality criteria');
+						fprintf(fid,'%s\t','max RSA [ms] - meeting quality criteria');
+
+						fprintf(fid,'%s\t','mean RSA [ms] - not enough IBI');
+						fprintf(fid,'%s\t','mean RSA/VT [ms/l] - not enough IBI');
+%					   fprintf(fid,'%s\t','mean TTOT-corrected RSA/VT [ms/l] - not enough IBI');
+						fprintf(fid,'%s\t','mean VT [l] - not enough IBI');
+						fprintf(fid,'%s\t','mean TTOT [s] - not enough IBI');
+						fprintf(fid,'%s\t','mean HR [bpm] - not enough IBI');
+						fprintf(fid,'%s\t','min RSA [ms] - not enough IBI');
+						fprintf(fid,'%s\t','max RSA [ms] - not enough IBI');
+
+						fprintf(fid,'%s\t','mean RSA [ms] - failed applied PVC');
+						fprintf(fid,'%s\t','mean RSA/VT [ms/l] - failed applied PVC');
+%					   fprintf(fid,'%s\t','mean TTOT-corrected RSA/VT [ms/l] - failed applied PVC');
+						fprintf(fid,'%s\t','mean VT [l] - failed applied PVC');
+						fprintf(fid,'%s\t','mean TTOT [s] - failed applied PVC');
+						fprintf(fid,'%s\t','mean HR [bpm] - failed applied PVC');
+						fprintf(fid,'%s\t','min RSA [ms] - failed applied PVC');
+						fprintf(fid,'%s\t','max RSA [ms] - failed applied PVC');
+
+						fprintf(fid,'\n');
+					end;
+					fprintf(fid,'%s\t',batchDirExp);
+					fprintf(fid,'%s\t',tmpBatchFileSavename);
+					if noOfFilenameElements>0
+						fprintf(fid,'%s\t',tmpBatchFileSavenamePrint);
+					end;
+					fprintf(fid,'%s\t',num2str(PVC)); %flag defining criterion set applied in rsaClearFlag
+					if infantOption==1
+						fprintf(fid,'%s\t','1'); %flag indicating whether infantOption was turned on (=1) or off (=0)
+					else
+						fprintf(fid,'%s\t','0'); %flag indicating whether infantOption was turned on (=1) or off (=0)
+					end;
+					fprintf(fid,'%s\t',num2str(IBIcountExp));%all
+					fprintf(fid,'%s\t',num2str(IBIcountExpF));%meeting all quality criteria applied by rsaClearFlag
+					fprintf(fid,'%s\t',num2str(notEnoughIBIExpF));%not enough IBI
+					fprintf(fid,'%s\t',num2str(PVCfailExpF));%enough IBI but failed peak valley criterion set in rsaClearFlag (may be the same as the following!)
+					fprintf(fid,'%s\t',num2str(length(find(IBIdiffTypeExp==2 | IBIdiffTypeExp==6))));%enough IBI but failed lenient peak valley criterion
+					fprintf(fid,'%s\t',num2str(length(find(flagTTOTExp{1,1}==1))));%exclued via data flag (typically indicating an artifact)
+
+%				   fprintf(fid,'%s\t',num2str(rsaNanmean(IBIdiffExp)));%mean RSA all
+%				   fprintf(fid,'%s\t',num2str(rsaNanmean(IBIdiffExp)/rsaNanmean(tempVT)));%mean RV all
+%				   fprintf(fid,'%s\t',num2str(rsaNanmean(tempVT)));%mean VT all
+%				   fprintf(fid,'%s\t',num2str(rsaNanmean(tempTTOT)));%mean TTOT all
+%				   fprintf(fid,'%s\t',num2str(rsaNanmean(HRperBreathExp)));%mean heart rate all
+%				   nans=isnan(IBIminExp);
+%				   iNans=find(nans);
+%				   tempIBIminExp=IBIminExp;
+%				   tempIBIminExp(iNans)=Inf;
+%				   fprintf(fid,'%s\t',num2str(min(tempIBIminExp)));%min RSA all
+%				   nans=isnan(IBImaxExp);
+%				   iNans=find(nans);
+%				   tempIBImaxExp=IBImaxExp;
+%				   tempIBImaxExp(iNans)=zeros(size(iNans));
+%				   fprintf(fid,'%s\t',num2str(max(tempIBImaxExp)));%max RSA all
+
+					fprintf(fid,'%s\t',num2str(rsaNanmean(IBIdiffExpF)));%mean RSA meeting all quality criteria applied by rsaClearFlag
+					fprintf(fid,'%s\t',num2str(experimentalRVMean));%mean RV meeting all quality criteria applied by rsaClearFlag
+					fprintf(fid,'%s\t',num2str(experimentalRVDifMean));%mean TTOT corrected RV meeting all quality criteria applied by rsaClearFlag
+					fprintf(fid,'%s\t',num2str(rsaNanmean(experimentalVTF)));%mean VT meeting all quality criteria applied by rsaClearFlag
+					fprintf(fid,'%s\t',num2str(rsaNanmean(experimentalTTOTF)));%mean TTOT meeting all quality criteria applied by rsaClearFlag
+					fprintf(fid,'%3.2f\t',rsaNanmean(HRperBreathExpF));%mean heart rate meeting all quality criteria applied by rsaClearFlag
+
+					nans=isnan(IBIminExpF);
+					iNans=find(nans);
+					tempIBIminExpF=IBIminExpF;
+					if ~isempty(iNans)
+						tempIBIminExpF(iNans)=Inf;
+					end;
+					if isempty(min(tempIBIminExpF))
+						fprintf(fid,'%s\t','NaN');%min RSA meeting all quality criteria applied by rsaClearFlag
+					else
+						fprintf(fid,'%s\t',num2str(min(tempIBIminExpF)));%min RSA meeting all quality criteria applied by rsaClearFlag
+					end;
+					nans=isnan(IBImaxExpF);
+					iNans=find(nans);
+					tempIBImaxExpF=IBImaxExpF;
+					if ~isempty(iNans)
+						tempIBImaxExpF(iNans)=zeros(size(iNans));
+					end;
+					if isempty(max(tempIBImaxExpF))
+						fprintf(fid,'%s\t','NaN');%min RSA meeting all quality criteria applied by rsaClearFlag
+					else
+						fprintf(fid,'%s\t',num2str(max(tempIBImaxExpF)));%max RSA meeting all quality criteria applied by rsaClearFlag
+					end;
+
+					tempSearchCriterion=find(IBIdiffTypeExp==3);
+					if ~isempty(tempSearchCriterion)
+						fprintf(fid,'%s\t',num2str(rsaNanmean(IBIdiffExp(find(IBIdiffTypeExp==3),1))));%mean RSA not enough IBI
+						fprintf(fid,'%s\t',num2str(rsaNanmean(tempRV(find(IBIdiffTypeExp==3),1))));%mean RV not enough IBI
+%					   fprintf(fid,'%s\t',num2str(rsaNanmean(experimentalRVDif(find(IBIdiffTypeExp==3),1))));%mean TTOT corrected RV not enough IBI
+						fprintf(fid,'%s\t',num2str(rsaNanmean(tempVT(find(IBIdiffTypeExp==3),1))));%mean VT not enough IBI
+						fprintf(fid,'%s\t',num2str(rsaNanmean(tempTTOT(find(IBIdiffTypeExp==3),1))));%mean TTOT not enough IBI
+						fprintf(fid,'%3.2f\t',rsaNanmean(HRperBreathExp(find(IBIdiffTypeExp==3),1)));%mean heart rate not enough IBI
+						nans=isnan(IBIminExp);
+						iNans=find(nans);
+						tempIBIminExp=IBIminExp;
+						if ~isempty(iNans)
+							tempIBIminExp(iNans)=Inf;
+						end;
+						if isempty(min(tempIBIminExp(find(IBIdiffTypeExp==3),1)))
+							fprintf(fid,'%s\t','NaN');%min RSA meeting all quality criteria applied by rsaClearFlag
+						else
+							fprintf(fid,'%s\t',num2str(min(tempIBIminExp(find(IBIdiffTypeExp==3),1))));%min RSA not enough IBI
+						end;
+						nans=isnan(IBImaxExp);
+						iNans=find(nans);
+						tempIBImaxExp=IBImaxExp;
+						if ~isempty(iNans)
+							tempIBImaxExp(iNans)=zeros(size(iNans));
+						end;
+						if isempty(max(tempIBImaxExp(find(IBIdiffTypeExp==3),1)))
+							fprintf(fid,'%s\t','NaN');%min RSA meeting all quality criteria applied by rsaClearFlag
+						else
+							fprintf(fid,'%s\t',num2str(max(tempIBImaxExp(find(IBIdiffTypeExp==3),1))));%max RSA not enough IBI
+						end;
+					else
+						fprintf(fid,'%s\t','NaN');
+						fprintf(fid,'%s\t','NaN');
+%					   fprintf(fid,'%s\t','NaN');
+						fprintf(fid,'%s\t','NaN');
+						fprintf(fid,'%s\t','NaN');
+						fprintf(fid,'%s\t','NaN');
+						fprintf(fid,'%s\t','NaN');
+						fprintf(fid,'%s\t','NaN');
+					end;
+
+					tempSearchCriterion=find(IBIdiffTypeExp==4 | IBIdiffTypeExp==8);
+					if ~isempty(tempSearchCriterion)
+						fprintf(fid,'%s\t',num2str(rsaNanmean(IBIdiffExp(find(IBIdiffTypeExp==4 | IBIdiffTypeExp==8),1))));%mean RSA enough IBI but failed peak valley criterion applied in rsaClearFlag
+						fprintf(fid,'%s\t',num2str(rsaNanmean(tempRV(find(IBIdiffTypeExp==4 | IBIdiffTypeExp==8),1))));%mean RV enough IBI but failed peak valley criterion applied in rsaClearFlag
+%					   fprintf(fid,'%s\t',num2str(rsaNanmean(experimentalRVDif(find(IBIdiffTypeExp==4 | IBIdiffTypeExp==8),1))));%mean TTOT corrected RV enough IBI but failed peak valley criterion applied in rsaClearFlag
+						fprintf(fid,'%s\t',num2str(rsaNanmean(tempVT(find(IBIdiffTypeExp==4 | IBIdiffTypeExp==8),1))));%mean VT enough IBI but failed peak valley criterion applied in rsaClearFlag
+						fprintf(fid,'%s\t',num2str(rsaNanmean(tempTTOT(find(IBIdiffTypeExp==4 | IBIdiffTypeExp==8),1))));%mean TTOT enough IBI but failed peak valley criterion applied in rsaClearFlag
+						fprintf(fid,'%3.2f\t',rsaNanmean(HRperBreathExp(find(IBIdiffTypeExp==4 | IBIdiffTypeExp==8),1)));%mean heart rate enough IBI but failed peak valley criterion applied in rsaClearFlag
+						nans=isnan(IBIminExp);
+						iNans=find(nans);
+						tempIBIminExp=IBIminExp;
+						if ~isempty(iNans)
+							tempIBIminExp(iNans)=Inf;
+						end;
+						if isempty(min(tempIBIminExp(find(IBIdiffTypeExp==4 | IBIdiffTypeExp==8),1)))
+							fprintf(fid,'%s\t','NaN');%min RSA meeting all quality criteria applied by rsaClearFlag
+						else
+							fprintf(fid,'%s\t',num2str(min(tempIBIminExp(find(IBIdiffTypeExp==4 | IBIdiffTypeExp==8),1))));%min RSA enough IBI but failed peak valley criterion applied in rsaClearFlag
+						end;
+						nans=isnan(IBImaxExp);
+						iNans=find(nans);
+						tempIBImaxExp=IBImaxExp;
+						if ~isempty(iNans)
+							tempIBImaxExp(iNans)=zeros(size(iNans));
+						end;
+						if isempty(max(tempIBImaxExp(find(IBIdiffTypeExp==4 | IBIdiffTypeExp==8),1)))
+							fprintf(fid,'%s\t','NaN');%min RSA meeting all quality criteria applied by rsaClearFlag
+						else
+							fprintf(fid,'%s\t',num2str(max(tempIBImaxExp(find(IBIdiffTypeExp==4 | IBIdiffTypeExp==8),1))));%max RSA enough IBI but failed peak valley criterion applied in rsaClearFlag
+						end;
+					else
+						fprintf(fid,'%s\t','NaN');
+						fprintf(fid,'%s\t','NaN');
+%					   fprintf(fid,'%s\t','NaN');
+						fprintf(fid,'%s\t','NaN');
+						fprintf(fid,'%s\t','NaN');
+						fprintf(fid,'%s\t','NaN');
+						fprintf(fid,'%s\t','NaN');
+						fprintf(fid,'%s\t','NaN');
+					end;
+					fprintf(fid,'\n');
+					fclose(fid);
+				end;
+			end;
+			global infantOption;
+			if infantOption==1
+				event_listString=[event_listString;{'Note: infant option is on.'}];
+			else
+				event_listString=[event_listString;{'Note: infant option is off.'}];
+			end;
+			event_listString=[event_listString;{'BATCH-MODE: Apply intercept and B completed.'}];
+			event_listString=[event_listString;{'______________________________________________________________________'}];
+		end;
+	end;
+	set(handles.event_list,'String',event_listString);
+	sTemp=size(event_listString);
+	set(handles.event_list,'Value',sTemp(1,1));
+	guidata(hObject,handles);
+
+% --------------------------------------------------------------------
+function helpMenu_Callback(hObject, eventdata, handles)
+% hObject	handle to helpMenu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles	structure with handles and user data (see GUIDATA)
+
+% --------------------------------------------------------------------
+function rsaToolboxHelp_Callback(hObject, eventdata, handles)
+% hObject	handle to rsaToolboxHelp (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles	structure with handles and user data (see GUIDATA)
+	rsaToolboxGuiHelp;
+	guidata(hObject,handles);
+
+% --------------------------------------------------------------------
+function AboutRsaToolbox_Callback(hObject, eventdata, handles)
+% hObject	handle to AboutRsaToolbox (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles	structure with handles and user data (see GUIDATA)
+	rsaToolboxGuiInfo;
+	guidata(hObject,handles);
+
+% --------------------------------------------------------------------
+function fileMenu_Callback(hObject, eventdata, handles)
+% hObject	handle to fileMenu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles	structure with handles and user data (see GUIDATA)
+
+% --------------------------------------------------------------------
+function exit_Callback(hObject, eventdata, handles)
+% hObject	handle to exit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles	structure with handles and user data (see GUIDATA)
+	delete(handles.figure1);
+	clear all;
+	clear all;
+
+% --------------------------------------------------------------------
+function optionsMenu_Callback(hObject, eventdata, handles)
+% hObject	handle to optionsMenu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles	structure with handles and user data (see GUIDATA)
+
+% --------------------------------------------------------------------
+function expertMode_Callback(hObject, eventdata, handles)
+% hObject	handle to expertMode (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles	structure with handles and user data (see GUIDATA)
+	expertModeStatus=get(hObject,'Checked');
+	global expertMode;
+	if expertModeStatus(end,end)=='f'
+		set(hObject,'Checked','on');
+		expertMode=1;
+	else
+		set(hObject,'Checked','off');
+		expertMode=0;
+	end;
+	guidata(hObject,handles);
+
+% --------------------------------------------------------------------
+function menuItemInfantOption_Callback(hObject, eventdata, handles)
+% hObject	handle to menuItemInfantOption (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles	structure with handles and user data (see GUIDATA)
+	infantOptionStatus=get(hObject,'Checked');
+	global infantOption;
+	if infantOptionStatus(end,end)=='f'
+		set(hObject,'Checked','on');
+		infantOption=1;
+	else
+		set(hObject,'Checked','off');
+		infantOption=0;
+	end;
+	guidata(hObject,handles);
+
+
+% --------------------------------------------------------------------
+function splitFilenames_Callback(hObject, eventdata, handles)
+% hObject	handle to splitFilenames (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles	structure with handles and user data (see GUIDATA)
+	event_listString=get(handles.event_list,'String');
+	splitFilenamesStatus=get(hObject,'Checked');
+	global splitFilename;
+	global answer;
+	if splitFilenamesStatus(end,end)=='f'
+		set(hObject,'Checked','on');
+		splitFilename=menu('Split filename at...','1 - every place that is not a letter or number','2 - only at characters to be specified');
+		event_listString=[event_listString;{'Files will be split at...'}];
+		if splitFilename==1
+			answer=[];
+			event_listString=[event_listString;{'...every place that is not a letter or number.'}];
+		elseif splitFilename==2
+			prompt = {'Enter any character number or sign where filenames should be split like e.g.'};
+			dlg_title = 'Input delimters used to split filenames.';
+			num_lines = 1;
+			def = {'.,;'};
+			answer = inputdlg(prompt,dlg_title,num_lines,def);
+			if isempty(char(answer))
+				splitFilename = 0;
+				event_listString=[event_listString;{'No place, because no characters have been specified.'}];
+			else
+			   event_listString=[event_listString;{['...the following characters: ',char(answer)]}];
+			end;
+		end;
+	else
+		set(hObject,'Checked','off');
+		splitFilename=0;
+		answer=[];
+		event_listString=[event_listString;{'Files will not be split anymore.'}];
+	end;
+	set(handles.event_list,'String',event_listString);
+	sTemp=size(event_listString);
+	set(handles.event_list,'Value',sTemp(1,1));
+	guidata(hObject,handles);
+
+% --------------------------------------------------------------------
+function toolMenu_Callback(hObject, eventdata, handles)
+% hObject	handle to toolMenu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles	structure with handles and user data (see GUIDATA)
+
+% --------------------------------------------------------------------
+function vivologicImport_v01_Callback(hObject, eventdata, handles)
+% hObject    handle to vivologicImport_v01 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+	event_listString=get(handles.event_list,'String');
+	event_listString=[event_listString;{['Import filter for VivioMetrics',char(174),' VivoLogic',char(174),' data export v01. - Copyright ',char(169),' 2009-2014 by Stefan M. Schulz']}];
+	event_listString=[event_listString;{'______________________________________________________________________'}];
+	event_listString=[event_listString;{'Quick Reference:'}];
+	event_listString=[event_listString;{'Two exports are required to use this tool:'}];
+	event_listString=[event_listString;{'The EKG R-peak (RR) export file has to include the following columns:'}];
+	event_listString=[event_listString;{'INDEX,YYYY/MM/DD,H: M: S: MS,RR'}];
+	event_listString=[event_listString;{'The respiration export file has to include the following columns:'}];
+	event_listString=[event_listString;{'INDEX,YYYY/MM/DD,H: M: S: MS,ViVol,VeVol,Tt'}];
+	event_listString=[event_listString;{'Exports must be saved in CSV format!'}];
+	event_listString=[event_listString;{'Note that the files should never contain additional data!'}];
+	event_listString=[event_listString;{'Internal format (i.e. column assignment) is crucial for proper function!'}];
+	event_listString=[event_listString;{'Note that the exported data is converted to the following units:'}];
+	event_listString=[event_listString;{'IBI [ms], VT [ml], TTOT [sec].'}];
+	event_listString=[event_listString;{'______________________________________________________________________'}];
+	set(handles.event_list,'String',event_listString);
+	sTemp=size(event_listString);
+	set(handles.event_list,'Value',sTemp(1,1));
+	guidata(hObject,handles);
+    errorLogger_Resp=0;
+    errorLogger_RR=0;
+
+	[fileName,pathName] = uigetfile({'*.csv','comma delimited files (*.csv)'},['Select any file from batch list.']);
+	if isequal([fileName,pathName],[0,0])
+		batchList=fileName;
+		event_listString=get(handles.event_list,'String');
+		event_listString=[event_listString;{'Please, select a valid file.'}];
+		event_listString=[event_listString;{['VivoLogic',char(174),' data import v01 aborts.']}];
+		event_listString=[event_listString;{'______________________________________________________________________'}];
+		set(handles.event_list,'String',event_listString);
+		sTemp=size(event_listString);
+		set(handles.event_list,'Value',sTemp(1,1));
+		guidata(hObject,handles);
+		return
+		% Otherwise construct the fullfilename and Check and load the file.
+	else
+		%analyse filenames
+		cd(pathName);
+		dateienResp=dir('*_Resp.csv');
+		dateienRR=dir('*_RR.csv');
+
+		for i=1:length(dateienResp)
+
+			fileResp=getfield(dateienResp(i,1),'name');
+			filePrefixResp=fileResp(1:end-9);
+			fileRR=getfield(dateienRR(i,1),'name');
+			filePrefixRR=fileRR(1:end-7);
+
+			if length(filePrefixResp)==length(filePrefixRR) & filePrefixResp==filePrefixRR
+			else
+				event_listString=get(handles.event_list,'String');
+				event_listString=[event_listString;{'Inconsistencies in batch file list found.'}];
+				event_listString=[event_listString;{['VivoLogic',char(174),' data import v01 aborts - please check your data!']}];
+				event_listString=[event_listString;{'______________________________________________________________________'}];
+				set(handles.event_list,'String',event_listString);
+				sTemp=size(event_listString);
+				set(handles.event_list,'Value',sTemp(1,1));
+				guidata(hObject,handles);
+				return
+			end;
+		end;
+		batchList=dateienResp;
+		event_listString=get(handles.event_list,'String');
+		event_listString=[event_listString;{'File list for batch processing successfully created.'}];
+		cd(pathName);
+		event_listString=[event_listString;{['Data will be imported from ',pathName]}];
+		warning off MATLAB:MKDIR:DirectoryExists;
+		mkdir('data_generated_for_rsaToolbox');
+		event_listString=[event_listString;{['Data will be saved to ',pathName,'data_generated_for_rsaToolbox\..']}];
+		event_listString=[event_listString;{['Check file ',pathName,'data_generated_for_rsaToolbox\description.txt for a summary of descriptive information.']}];
+		event_listString=[event_listString;{'______________________________________________________________________'}];
+		set(handles.event_list,'String',event_listString);
+		sTemp=size(event_listString);
+		set(handles.event_list,'Value',sTemp(1,1));
+		guidata(hObject,handles);
+
+		for j=1:length(batchList)
+
+			filename01=getfield(batchList(j,1),'name');
+			filePrefix01=filename01(1:end-9);
+			filename02=[filePrefix01,'_RR.csv'];
+
+			tmpBatchFileSavename=filePrefix01;
+			noOfFilenameElements=0;
+			global splitFilename;
+			global answer;
+			switch splitFilename
+				case 0
+				case 1
+					aC=find(~isstrprop(tmpBatchFileSavename,'alphanum'));
+					bC=aC(1,find(diff(find(~isstrprop(tmpBatchFileSavename,'alphanum')))==1));
+					if ~isempty(bC)
+						tmpBatchFileSavename(bC)=[];
+					end;
+					noOfFilenameElements=length(find(~isstrprop(tmpBatchFileSavename,'alphanum')));
+					tmpBatchFileSavenamePrint=tmpBatchFileSavename;
+					tmpBatchFileSavenamePrint(~isstrprop(tmpBatchFileSavename,'alphanum'))=char(9);
+				case 2
+					aC=find(ismember(tmpBatchFileSavename,char(answer)));
+					bC=aC(1,find(diff(find(ismember(tmpBatchFileSavename,char(answer))))==1));
+					if ~isempty(bC)
+						tmpBatchFileSavename(bC)=[];
+					end;
+					noOfFilenameElements=length(find(ismember(tmpBatchFileSavename,char(answer))));
+					tmpBatchFileSavenamePrint=tmpBatchFileSavename;
+					tmpBatchFileSavenamePrint(ismember(tmpBatchFileSavename,char(answer)))=char(9);
+			end;
+
+			if j==1
+				fid = fopen([pathName,'data_generated_for_rsaToolbox\description.txt'],'a');
+				fprintf(fid,'%s\n',char(['rsaToolbox v2.0.1 by Stefan M. Schulz <schulz@psychologie.uni-wuerzburg.de> - VivoLogic',char(174),' data import v01:',char(9),datestr(now)]));
+				fprintf(fid,'%s\t','data folder');
+				if noOfFilenameElements>0
+					fprintf(fid,'%s\t','dataset');
+					for nFilenameElements=1:noOfFilenameElements+1
+						fprintf(fid,'%s\t',['filename part ',num2str(nFilenameElements)]);
+					end;
+					fprintf(fid,'%s\t','IBI Mean [ms]','IBI SD','VT Mean [l]','VT SD','TTOT Mean [s]','TTOT SD','Number of intervals with one or more missing breathing cycles','Number of intervals with one or more missing IBI','Number of IBI > 1SD of mean IBI','Number of IBI > 2SD of mean IBI','Number of IBI > 3SD of mean IBI');
+				else
+					fprintf(fid,'%s\t','dataset','IBI Mean [ms]','IBI SD','VT Mean [l]','VT SD','TTOT Mean [s]','TTOT SD','Number of intervals with one or more missing breathing cycles','Number of intervals with one or more missing IBI','Number of IBI > 1SD of mean IBI','Number of IBI > 2SD of mean IBI','Number of IBI > 3SD of mean IBI');
+				end;
+				fprintf(fid,'\n');
+				fclose(fid);
+      			fid = fopen([pathName,'data_generated_for_rsaToolbox\errorLog.txt'],'a');
+    			fprintf(fid,'%s',char(['rsaToolbox v2.0.1 by Stefan M. Schulz <schulz@psychologie.uni-wuerzburg.de> - VivoLogic',char(174),' data import v01:',char(9),datestr(now)]));
+				fprintf(fid,'\n');
+				fclose(fid);
+            end;
+
+			%GET RESPIRATION DATA...
+			event_listString=get(handles.event_list,'String');
+			event_listString=[event_listString;{['Importing ',filename01]}];
+			file01=importdata([pathName,filename01]);
+			file01=struct2cell(file01);
+			respData=file01{1,1};
+            respText=file01{2,1};
+			respTimeA=char(respText{2,3});
+			respTimeA(find(isspace(respTimeA)==1))=[];
+			respTime=[respTimeA;char(respText{3:end,3})];
+			respTime=(str2num(respTime(:,1:2))*60*60*1000)+(str2num(respTime(:,4:5))*60*1000)+(str2num(respTime(:,7:8))*1000)+(str2num(respTime(:,10:12)));
+
+        	%'INDEX,YYYY/MM/DD,H: M: S: MS,ViVol,VeVol,Tt'
+            respHeader=char(respText{1,:});
+            respHeader=cellstr(respHeader);
+            respHeader=(strtrim(respHeader'));
+            respHeader3={};
+            for n=1:length(respHeader(1,:))
+                respHeader2=strsplit(respHeader{1,n},',');
+                respHeader3=cat(2,respHeader3,respHeader2);
+            end;
+            respHeader=respHeader3;
+            
+  			fid = fopen([pathName,'data_generated_for_rsaToolbox\errorLog.txt'],'a');
+            if find(strcmp('ViVol',respHeader))==4 & find(strcmp('VeVol',respHeader))==5 & find(strcmp('Tt',respHeader))==6
+                fprintf(fid,'%s','Data in file ',filename01,' looks fine.');
+    			fprintf(fid,'\n');
+            else
+            	event_listString=[event_listString;{['WARNING!!! ViVol, VeVol or Tt in file ',filename01,' is NOT in the expected column of your respiration export. Please check your data!' ]}];
+      			event_listString=[event_listString;{['WARNING!!! Program continues but data for ',filename01,' may be incorrect!' ]}];
+                fprintf(fid,'%s','WARNING!!! ViVol, VeVol or Tt in file ',filename01,' is NOT in the expected column of your respiration export. Please check your data!');
+    			fprintf(fid,'\n');
+                errorLogger_Resp=1;
+            end;
+       		fclose(fid);
+
+			%default as reported in the help files and documentation
+			vt=(respData(:,1)+respData(:,2))/2;
+			ttot=respData(:,3);
+			%for optional use when RTBI was also exported
+			%vt=(respData(2:end,2)+respData(2:end,3))/2;
+			%ttot=respData(2:end,4);
+			%for optional use when data is exported as follows:"
+			%INDEX,YYYY/MM/DD,  H: M: S: MS,	 ViVol,	 VeVol,		Ti,		Te,		Tt,  ..."
+			%vt=(respData(2:end,1)+respData(2:end,2))/2;
+			%ttot=respData(2:end,5);
+
+			if length(respTime(:,1)) > length(ttot)
+				tempNaNs=ones(length(respTime(:,1))-length(ttot));
+				tempNaNs=NaN;
+				vt=[tempNaNs';vt];
+				ttot=[tempNaNs';ttot];
+			end;
+
+			flagTtot=isnan(ttot);
+
+			%restoring missing respiration data, and producing flags to keep track of it
+			for n=(find(isnan(ttot)))';
+				ttot(n,1)=(respTime(n+1,:)-respTime(n,:))/1000;
+			end;
+
+			%GET IBI DATA...
+			event_listString=[event_listString;{['Importing ',filename02]}];
+			file02=importdata([pathName,filename02]);
+			file02=struct2cell(file02);
+			rrData=file02{1,1};
+			rrText=file02{2,1};
+			rrTimeA=char(rrText{2,3});
+			rrTimeA(find(isspace(rrTimeA)==1))=[];
+			rrTime=[rrTimeA;char(rrText{3:end,3})];
+			rrTime=(str2num(rrTime(:,1:2))*60*60*1000)+(str2num(rrTime(:,4:5))*60*1000)+(str2num(rrTime(:,7:8))*1000)+(str2num(rrTime(:,10:12)));
+
+         	%'INDEX,YYYY/MM/DD,H: M: S: MS,RR'
+            rrHeader=char(rrText{1,:});
+            rrHeader=cellstr(rrHeader);
+            rrHeader=(strtrim(rrHeader'));
+            rrHeader3={};
+            for n=1:length(rrHeader(1,:))
+                rrHeader2=strsplit(rrHeader{1,n},',');
+                rrHeader3=cat(2,rrHeader3,rrHeader2);
+            end;
+            rrHeader=rrHeader3;
+
+  			fid = fopen([pathName,'data_generated_for_rsaToolbox\errorLog.txt'],'a');
+            if find(strcmp('RR',rrHeader))==4
+                fprintf(fid,'%s','Data in file ',filename02,' looks fine.');
+    			fprintf(fid,'\n');
+            else
+      			event_listString=[event_listString;{['WARNING!!! RR in file ',filename02,' is NOT in the expected column of your EKG/RR export. Please check your data!' ]}];
+      			event_listString=[event_listString;{['WARNING!!! Program continues but data for ',filename02,' may be incorrect!' ]}];
+                fprintf(fid,'%s','WARNING!!! RR in file ',filename02,' is NOT in the expected column of your EKG/RR export. Please check your data!');
+    			fprintf(fid,'\n');
+                errorLogger_RR=1;
+            end;
+       		fclose(fid);
+            
+			ibi=rrData(:,1);
+			if length(rrTime(:,1)) > length(ibi)
+				tempNaNs=ones(length(rrTime(:,1)) > length(ibi));
+				tempNaNs=NaN;
+				ibi=[tempNaNs';ibi];
+			end;
+
+			%restoring missing ibi data, and producing flags to keep track of it
+			rrDataFlag=isnan(ibi);
+			for n=(find(isnan(ibi)))'
+				ibi(n,1)=(rrTime(n+1,:)-rrTime(n,:))/1000;
+			end;
+
+			%SYNCING RESPIRATION AND IBI DATA
+			respTimeStartNum=respTime(find(flagTtot==0),1);
+			respTimeStartNum=(respTimeStartNum(1,1));
+
+			n=1;
+			while rrTime(n,1)<respTime(1,1)
+				n=n+1;
+			end;
+			syncTime=(rrTime(n,1)-respTime(1,1));
+			syncTimeMs=syncTime/1000;
+
+			ibi=ibi(n+1:end,1);
+			ibi=cat(1,syncTimeMs,ibi);
+			rrDataFlag=cat(1,1,rrDataFlag(n+1:end,1));
+
+			%ttot is in sec
+			vt=vt/1000;%l
+			ibi=ibi*1000;%ms
+
+			global expertMode;
+			if expertMode==1
+				if j==1
+					interpolateIBISelection=menu('Interpolate IBI marked as artifact and comprising outliers (> 1, 2, and 3 SD) and create additonal output files?','1 - yes','2 - no');
+				end;
+			else
+				interpolateIBISelection=2;
+			end;
+
+			ibiFlagPos=find(rrDataFlag==1);
+			ibiFlagPos=ibiFlagPos(2:end,:);
+			if ~isempty(ibiFlagPos) & ~isempty(find(rrDataFlag==0))
+				ibiFlagPos1SD=find(ibi(ibiFlagPos)>(mean(ibi(find(rrDataFlag==0)),1)+std(ibi(find(rrDataFlag==0)))));
+				ibiFlagPos2SD=find(ibi(ibiFlagPos)>(mean(ibi(find(rrDataFlag==0)),1)+2*std(ibi(find(rrDataFlag==0)))));
+				ibiFlagPos3SD=find(ibi(ibiFlagPos)>(mean(ibi(find(rrDataFlag==0)),1)+3*std(ibi(find(rrDataFlag==0)))));
+			else
+				ibiFlagPos1SD=[];
+				ibiFlagPos2SD=[];
+				ibiFlagPos3SD=[];
+			end;
+
+			if interpolateIBISelection==1
+			if ~isempty(ibiFlagPos1SD)
+				ibiFlagPos1SD=ibiFlagPos(ibiFlagPos1SD);
+				previousN=1;
+				ibi1SD=[];
+				rrDataFlag1SD=[];
+				for n=1:length(ibiFlagPos1SD)
+					if ibiFlagPos1SD(n) < length(ibi)
+						den=round(ibi(ibiFlagPos1SD(n))/((ibi(ibiFlagPos1SD(n)-1)+ibi(ibiFlagPos1SD(n)+1))/2));
+						ibiDen=round(ibi(ibiFlagPos1SD(n))/den);
+						ibiDenStretch=([1:1:den]*0)+ibiDen;
+%						error1SD(n)=(ibiDen*den)-ibi(ibiFlagPos1SD(n));%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%xxx
+%						error1SD(n)=sum(ibiDenStretch)-ibi(ibiFlagPos1SD(n));%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%xxx
+						if n+1 <= length(ibiFlagPos1SD)
+							if ibiFlagPos1SD(n)+1 < ibiFlagPos1SD(n+1)
+								artifactFreePostIbiDenStretch=ibi(ibiFlagPos1SD(n)+1:ibiFlagPos1SD(n+1)-1);
+								artifactFreePostIbiDenStretchFlag=rrDataFlag(ibiFlagPos1SD(n)+1:ibiFlagPos1SD(n+1)-1);
+							else
+								artifactFreePostIbiDenStretch=[];
+								artifactFreePostIbiDenStretchFlag=[];
+							end;
+						elseif n+1 == length(ibiFlagPos1SD)+1
+							artifactFreePostIbiDenStretch=ibi(ibiFlagPos1SD(n)+1:end);
+							artifactFreePostIbiDenStretchFlag=rrDataFlag(ibiFlagPos1SD(n)+1:end);
+						else
+							artifactFreePostIbiDenStretch=[];
+							artifactFreePostIbiDenStretchFlag=[];
+						end;
+						ibi1SD=cat(1,ibi1SD,[ibi(previousN:ibiFlagPos1SD(n)-1);ibiDenStretch';artifactFreePostIbiDenStretch]);
+						rrDataFlagDenStretch=([1:1:den]*0)+2;
+						rrDataFlag1SD=cat(1,rrDataFlag1SD,[rrDataFlag(previousN:ibiFlagPos1SD(n)-1);rrDataFlagDenStretch';artifactFreePostIbiDenStretchFlag]);
+						previousN=length(ibi1SD)+1;
+					end;
+				end;
+%				sum(error1SD);%%%%%%%%%%%%%%%%%xxx
+				ibi1SD=cat(1,ibi1SD,ibi(previousN:end));
+				rrDataFlag1SD=cat(1,rrDataFlag1SD,rrDataFlag(previousN:end));
+				dlmwrite([pathName,'data_generated_for_rsaToolbox\',filePrefix01,'_1SD_IBI.csv'],ibi1SD,'\t');
+				dlmwrite([pathName,'data_generated_for_rsaToolbox\',filePrefix01,'_1SD_IBIflag.csv'],rrDataFlag1SD,'\t');
+				event_listString=[event_listString;{[num2str(length(find(rrDataFlag1SD==2))-(length(find(rrDataFlag==1))-1)),' intervals were added because the ibi was more than 1SD longer than expected.']}];
+			end;
+			if ~isempty(ibiFlagPos2SD)
+				ibiFlagPos2SD=ibiFlagPos(ibiFlagPos2SD);
+				previousN=1;
+				ibi2SD=[];
+				rrDataFlag2SD=[];
+				for n=1:length(ibiFlagPos2SD)
+					if ibiFlagPos2SD(n) < length(ibi)
+						den=round(ibi(ibiFlagPos2SD(n))/((ibi(ibiFlagPos2SD(n)-1)+ibi(ibiFlagPos2SD(n)+1))/2));
+						ibiDen=round(ibi(ibiFlagPos2SD(n))/den);
+						ibiDenStretch=([1:1:den]*0)+ibiDen;
+%						error2SD(n)=(ibiDen*den)-ibi(ibiFlagPos2SD(n));%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%xxx
+%						error2SD(n)=sum(ibiDenStretch)-ibi(ibiFlagPos2SD(n));%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%xxx
+						if n+1 <= length(ibiFlagPos2SD)
+							if ibiFlagPos2SD(n)+1 < ibiFlagPos2SD(n+1)
+								artifactFreePostIbiDenStretch=ibi(ibiFlagPos2SD(n)+1:ibiFlagPos2SD(n+1)-1);
+								artifactFreePostIbiDenStretchFlag=rrDataFlag(ibiFlagPos2SD(n)+1:ibiFlagPos2SD(n+1)-1);
+							else
+								artifactFreePostIbiDenStretch=[];
+								artifactFreePostIbiDenStretchFlag=[];
+							end;
+						elseif n+1 == length(ibiFlagPos2SD)+1
+							artifactFreePostIbiDenStretch=ibi(ibiFlagPos2SD(n)+1:end);
+							artifactFreePostIbiDenStretchFlag=rrDataFlag(ibiFlagPos2SD(n)+1:end);
+						else
+							artifactFreePostIbiDenStretch=[];
+							artifactFreePostIbiDenStretchFlag=[];
+						end;
+						ibi2SD=cat(1,ibi2SD,[ibi(previousN:ibiFlagPos2SD(n)-1);ibiDenStretch';artifactFreePostIbiDenStretch]);
+						rrDataFlagDenStretch=([1:1:den]*0)+2;
+						rrDataFlag2SD=cat(1,rrDataFlag2SD,[rrDataFlag(previousN:ibiFlagPos2SD(n)-1);rrDataFlagDenStretch';artifactFreePostIbiDenStretchFlag]);
+						previousN=length(ibi2SD)+1;
+					end;
+				end;
+%				sum(error2SD);%%%%%%%%%%%%%%%%%xxx
+				ibi2SD=cat(1,ibi2SD,ibi(previousN:end));
+				rrDataFlag2SD=cat(1,rrDataFlag2SD,rrDataFlag(previousN:end));
+				dlmwrite([pathName,'data_generated_for_rsaToolbox\',filePrefix01,'_2SD_IBI.csv'],ibi2SD,'\t');
+				dlmwrite([pathName,'data_generated_for_rsaToolbox\',filePrefix01,'_2SD_IBIflag.csv'],rrDataFlag2SD,'\t');
+				event_listString=[event_listString;{[num2str(length(find(rrDataFlag2SD==2))-(length(find(rrDataFlag==1))-1)),' intervals were added because the ibi was more than 2SD longer than expected.']}];
+			end;
+			if ~isempty(ibiFlagPos3SD)
+				ibiFlagPos3SD=ibiFlagPos(ibiFlagPos3SD);
+				previousN=1;
+				ibi3SD=[];
+				rrDataFlag3SD=[];
+				for n=1:length(ibiFlagPos3SD)
+					if ibiFlagPos3SD(n) < length(ibi)
+						den=round(ibi(ibiFlagPos3SD(n))/((ibi(ibiFlagPos3SD(n)-1)+ibi(ibiFlagPos3SD(n)+1))/2));
+						ibiDen=round(ibi(ibiFlagPos3SD(n))/den);
+						ibiDenStretch=([1:1:den]*0)+ibiDen;
+%						error3SD(n)=(ibiDen*den)-ibi(ibiFlagPos3SD(n));%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%xxx
+%						error3SD(n)=sum(ibiDenStretch)-ibi(ibiFlagPos3SD(n));%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%xxx
+						if n+1 <= length(ibiFlagPos3SD)
+							if ibiFlagPos3SD(n)+1 < ibiFlagPos3SD(n+1)
+								artifactFreePostIbiDenStretch=ibi(ibiFlagPos3SD(n)+1:ibiFlagPos3SD(n+1)-1);
+								artifactFreePostIbiDenStretchFlag=rrDataFlag(ibiFlagPos3SD(n)+1:ibiFlagPos3SD(n+1)-1);
+							else
+								artifactFreePostIbiDenStretch=[];
+								artifactFreePostIbiDenStretchFlag=[];
+							end;
+						elseif n+1 == length(ibiFlagPos3SD)+1
+							artifactFreePostIbiDenStretch=ibi(ibiFlagPos3SD(n)+1:end);
+							artifactFreePostIbiDenStretchFlag=rrDataFlag(ibiFlagPos3SD(n)+1:end);
+						else
+						artifactFreePostIbiDenStretch=[];
+						artifactFreePostIbiDenStretchFlag=[];
+						end;
+						ibi3SD=cat(1,ibi3SD,[ibi(previousN:ibiFlagPos3SD(n)-1);ibiDenStretch';artifactFreePostIbiDenStretch]);
+						rrDataFlagDenStretch=([1:1:den]*0)+2;
+						rrDataFlag3SD=cat(1,rrDataFlag3SD,[rrDataFlag(previousN:ibiFlagPos3SD(n)-1);rrDataFlagDenStretch';artifactFreePostIbiDenStretchFlag]);
+						previousN=length(ibi3SD)+1;
+					end;
+				end;
+%				sum(error3SD);%%%%%%%%%%%%%%%%%xxx
+				ibi3SD=cat(1,ibi3SD,ibi(previousN:end));
+				rrDataFlag3SD=cat(1,rrDataFlag3SD,rrDataFlag(previousN:end));
+				dlmwrite([pathName,'data_generated_for_rsaToolbox\',filePrefix01,'_3SD_IBI.csv'],ibi3SD,'\t');
+				dlmwrite([pathName,'data_generated_for_rsaToolbox\',filePrefix01,'_3SD_IBIflag.csv'],rrDataFlag3SD,'\t');
+				event_listString=[event_listString;{[num2str(length(find(rrDataFlag3SD==2))-(length(find(rrDataFlag==1))-1)),' intervals were added because the ibi was more than 3SD longer than expected.']}];
+			end;
+			end;
+
+			dlmwrite([pathName,'data_generated_for_rsaToolbox\',filePrefix01,'_TTOT.csv'],ttot,'\t');
+			dlmwrite([pathName,'data_generated_for_rsaToolbox\',filePrefix01,'_VT.csv'],vt,'\t');
+			dlmwrite([pathName,'data_generated_for_rsaToolbox\',filePrefix01,'_IBI.csv'],ibi,'\t');
+			event_listString=[event_listString;{['Saving TTOT [s], VT [l], IBI [ms] to separate files at ',pathName,'data_generated_for_rsaToolbox\']}];
+			event_listString=[event_listString;{['Saving ',filePrefix01,'_TTOT.csv']}];
+			event_listString=[event_listString;{['Saving ',filePrefix01,'_VT.csv']}];
+			event_listString=[event_listString;{['Saving ',filePrefix01,'_IBI.csv']}];
+
+			dlmwrite([pathName,'data_generated_for_rsaToolbox\',filePrefix01,'_IBIflag.csv'],rrDataFlag,'\t');
+			event_listString=[event_listString;{['Saving information about missing ibi (flag: 1=missing) at ',pathName,'data_generated_for_rsaToolbox\']}];
+			event_listString=[event_listString;{['Saving ',filePrefix01,'_IBIflag.csv']}];
+
+			dlmwrite([pathName,'data_generated_for_rsaToolbox\',filePrefix01,'_TTOTflag.csv'],flagTtot,'\t');
+			event_listString=[event_listString;{['Saving information about missing breathing cycles (flag: 1=missing) at ',pathName,'data_generated_for_rsaToolbox\']}];
+			event_listString=[event_listString;{['Saving ',filePrefix01,'_TTOTflag.csv']}];
+
+			fid = fopen([pathName,'data_generated_for_rsaToolbox\description.txt'],'a');
+			fprintf(fid,'%s\t',pathName);
+			fprintf(fid,'%s\t',tmpBatchFileSavename);
+			if noOfFilenameElements>0
+				fprintf(fid,'%s\t',tmpBatchFileSavenamePrint);
+			end;
+			fprintf(fid,'%s\t',num2str(mean(ibi(find(rrDataFlag==0),1))));
+			fprintf(fid,'%s\t',num2str(std(ibi(find(rrDataFlag==0),1))));
+			fprintf(fid,'%s\t',num2str(num2str(mean(vt(find(flagTtot==0),1)))));
+			fprintf(fid,'%s\t',num2str(std(vt(find(flagTtot==0),1))));
+			fprintf(fid,'%s\t',num2str(mean(ttot(find(flagTtot==0),1))));
+			fprintf(fid,'%s\t',num2str(std(ttot(find(flagTtot==0),1))));
+			fprintf(fid,'%s\t',num2str(length(find(flagTtot==1))));
+			fprintf(fid,'%s\t',num2str(length(find(rrDataFlag==1))-1));
+			fprintf(fid,'%s\t',num2str(length(ibiFlagPos1SD)));
+%			fprintf(fid,'%s\t',num2str(length(find(rrDataFlag1SD==2)))-(length(find(rrDataFlag==1))-1));
+			fprintf(fid,'%s\t',num2str(length(ibiFlagPos2SD)));
+%			fprintf(fid,'%s\t',num2str(length(find(rrDataFlag2SD==2)))-(length(find(rrDataFlag==1))-1));
+			fprintf(fid,'%s\t',num2str(length(ibiFlagPos3SD)));
+%			fprintf(fid,'%s\t',num2str(length(find(rrDataFlag3SD==2)))-(length(find(rrDataFlag==1))-1));
+			fprintf(fid,'\n');
+			fclose(fid);
+
+			event_listString=[event_listString;{'______________________________________________________________________'}];
+			event_listString=[event_listString;{['Descriptive overview of the data based on valid information in files with prefix ',filePrefix01,':']}];
+			event_listString=[event_listString;{['IBI [ms]: M=',num2str(mean(ibi(find(rrDataFlag~=1),1))),', SD=',num2str(std(ibi(find(rrDataFlag~=1),1)))]}];
+			event_listString=[event_listString;{['VT   [l]: M=',num2str(mean(vt(find(flagTtot~=1),1))),', SD=',num2str(std(vt(find(flagTtot~=1),1)))]}];
+			event_listString=[event_listString;{['TTOT [s]: M=',num2str(mean(ttot(find(flagTtot~=1),1))),', SD=',num2str(std(ttot(find(flagTtot~=1),1)))]}];
+			event_listString=[event_listString;{['There are ',num2str(length(find(flagTtot==1))),' intervals with one or more missing breathing cycles.']}];
+			event_listString=[event_listString;{['There are ',num2str(length(find(rrDataFlag==1))-1),' intervals with one or more missing ibi.']}];
+			event_listString=[event_listString;{'______________________________________________________________________'}];
+			set(handles.event_list,'String',event_listString);
+			sTemp=size(event_listString);
+			set(handles.event_list,'Value',sTemp(1,1));
+			guidata(hObject,handles);
+		end;
+	end;
+	event_listString=get(handles.event_list,'String');
+	event_listString=[event_listString;{'WARNING: Do not use these files to compute means etc. for IBI, VT or TTOT!'}];
+	event_listString=[event_listString;{'This import filter automatically fills in missing data and adds information'}];
+	event_listString=[event_listString;{'to allow rsaToolbox to exhaust the given information.'}];
+	event_listString=[event_listString;{' '}];
+    if errorLogger_Resp==0 & errorLogger_RR==0
+    	event_listString=[event_listString;{['Import filter for VivoLogic',char(174),' data export v01 - terminated succesfully.']}];
+    else
+    	event_listString=[event_listString;{['Import filter for VivoLogic',char(174),' data export v01 - procdure complete.']}];
+    	event_listString=[event_listString;{[' ']}];
+    	event_listString=[event_listString;{['WARNING!!! There have been errors. Check the log in the Event Monitor!']}];
+    end;
+    event_listString=[event_listString;{'______________________________________________________________________'}];
+	set(handles.event_list,'String',event_listString);
+	sTemp=size(event_listString);
+	set(handles.event_list,'Value',sTemp(1,1));
+	guidata(hObject,handles);
+    
+function vivologicImport_v02_Callback(hObject, eventdata, handles)
+% hObject	handle to vivologicImport_v01 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles	structure with handles and user data (see GUIDATA)
+	event_listString=get(handles.event_list,'String');
+	event_listString=[event_listString;{['Import filter for VivioMetrics',char(174),' VivoLogic',char(174),' data export v02. - Copyright ',char(169),' 2009-2014 by Stefan M. Schulz']}];
+	event_listString=[event_listString;{'______________________________________________________________________'}];
+	event_listString=[event_listString;{'Quick Reference:'}];
+	event_listString=[event_listString;{'Two exports are required to use this tool:'}];
+	event_listString=[event_listString;{'The EKG R-peak (RR) export file has to include the following columns:'}];
+	event_listString=[event_listString;{'INDEX,YYYY/MM/DD,H: M: S: MS,RR'}];
+	event_listString=[event_listString;{'The respiration export file has to include the following columns:'}];
+	event_listString=[event_listString;{'INDEX,YYYY/MM/DD,H: M: S: MS,ViVol,VeVol,Ti,Te,Tt,...'}];
+	event_listString=[event_listString;{'Exports must be saved in CSV format!'}];
+	event_listString=[event_listString;{'Note that the files should never contain additional data!'}];
+	event_listString=[event_listString;{'Internal format (i.e. column assignment) is crucial for proper function!'}];
+	event_listString=[event_listString;{'Note that the exported data is converted to the following units:'}];
+	event_listString=[event_listString;{'IBI [ms], VT [ml], TTOT [sec].'}];
+	event_listString=[event_listString;{'______________________________________________________________________'}];
+	set(handles.event_list,'String',event_listString);
+	sTemp=size(event_listString);
+	set(handles.event_list,'Value',sTemp(1,1));
+	guidata(hObject,handles);
+    errorLogger=0;
+
+	[fileName,pathName] = uigetfile({'*.csv','comma delimited files (*.csv)'},['Select any file from batch list.']);
+	if isequal([fileName,pathName],[0,0])
+		batchList=fileName;
+		event_listString=get(handles.event_list,'String');
+		event_listString=[event_listString;{'Please, select a valid file.'}];
+		event_listString=[event_listString;{['VivoLogic',char(174),' data import v02 aborts.']}];
+		event_listString=[event_listString;{'______________________________________________________________________'}];
+		set(handles.event_list,'String',event_listString);
+		sTemp=size(event_listString);
+		set(handles.event_list,'Value',sTemp(1,1));
+		guidata(hObject,handles);
+		return
+		% Otherwise construct the fullfilename and Check and load the file.
+	else
+		%analyse filenames
+		cd(pathName);
+		dateienResp=dir('*_Resp.csv');
+		dateienRR=dir('*_RR.csv');
+
+		for i=1:length(dateienResp)
+
+			fileResp=getfield(dateienResp(i,1),'name');
+			filePrefixResp=fileResp(1:end-9);
+			fileRR=getfield(dateienRR(i,1),'name');
+			filePrefixRR=fileRR(1:end-7);
+
+			if length(filePrefixResp)==length(filePrefixRR) & filePrefixResp==filePrefixRR
+			else
+				event_listString=get(handles.event_list,'String');
+				event_listString=[event_listString;{'Inconsistencies in batch file list found.'}];
+				event_listString=[event_listString;{['VivoLogic',char(174),' data import v02 aborts - please check your data!']}];
+				event_listString=[event_listString;{'______________________________________________________________________'}];
+				set(handles.event_list,'String',event_listString);
+				sTemp=size(event_listString);
+				set(handles.event_list,'Value',sTemp(1,1));
+				guidata(hObject,handles);
+				return
+			end;
+		end;
+		batchList=dateienResp;
+		event_listString=get(handles.event_list,'String');
+		event_listString=[event_listString;{'File list for batch processing successfully created.'}];
+		cd(pathName);
+		event_listString=[event_listString;{['Data will be imported from ',pathName]}];
+		warning off MATLAB:MKDIR:DirectoryExists;
+		mkdir('data_generated_for_rsaToolbox');
+		event_listString=[event_listString;{['Data will be saved to ',pathName,'data_generated_for_rsaToolbox\..']}];
+		event_listString=[event_listString;{['Check file ',pathName,'data_generated_for_rsaToolbox\description.txt for a summary of descriptive information.']}];
+		event_listString=[event_listString;{'______________________________________________________________________'}];
+		set(handles.event_list,'String',event_listString);
+		sTemp=size(event_listString);
+		set(handles.event_list,'Value',sTemp(1,1));
+		guidata(hObject,handles);
+
+		for j=1:length(batchList)
+
+			filename01=getfield(batchList(j,1),'name');
+			filePrefix01=filename01(1:end-9);
+			filename02=[filePrefix01,'_RR.csv'];
+
+			tmpBatchFileSavename=filePrefix01;
+			noOfFilenameElements=0;
+			global splitFilename;
+			global answer;
+			switch splitFilename
+				case 0
+				case 1
+					aC=find(~isstrprop(tmpBatchFileSavename,'alphanum'));
+					bC=aC(1,find(diff(find(~isstrprop(tmpBatchFileSavename,'alphanum')))==1));
+					if ~isempty(bC)
+						tmpBatchFileSavename(bC)=[];
+					end;
+					noOfFilenameElements=length(find(~isstrprop(tmpBatchFileSavename,'alphanum')));
+					tmpBatchFileSavenamePrint=tmpBatchFileSavename;
+					tmpBatchFileSavenamePrint(~isstrprop(tmpBatchFileSavename,'alphanum'))=char(9);
+				case 2
+					aC=find(ismember(tmpBatchFileSavename,char(answer)));
+					bC=aC(1,find(diff(find(ismember(tmpBatchFileSavename,char(answer))))==1));
+					if ~isempty(bC)
+						tmpBatchFileSavename(bC)=[];
+					end;
+					noOfFilenameElements=length(find(ismember(tmpBatchFileSavename,char(answer))));
+					tmpBatchFileSavenamePrint=tmpBatchFileSavename;
+					tmpBatchFileSavenamePrint(ismember(tmpBatchFileSavename,char(answer)))=char(9);
+			end;
+
+			if j==1
+				fid = fopen([pathName,'data_generated_for_rsaToolbox\description.txt'],'a');
+				fprintf(fid,'%s\n',char(['rsaToolbox v2.0.1 by Stefan M. Schulz <schulz@psychologie.uni-wuerzburg.de> - VivoLogic',char(174),' data import v02:',char(9),datestr(now)]));
+				fprintf(fid,'%s\t','data folder');
+				if noOfFilenameElements>0
+					fprintf(fid,'%s\t','dataset');
+					for nFilenameElements=1:noOfFilenameElements+1
+						fprintf(fid,'%s\t',['filename part ',num2str(nFilenameElements)]);
+					end;
+					fprintf(fid,'%s\t','IBI Mean [ms]','IBI SD','VT Mean [l]','VT SD','TTOT Mean [s]','TTOT SD','Number of intervals with one or more missing breathing cycles','Number of intervals with one or more missing IBI','Number of IBI > 1SD of mean IBI','Number of IBI > 2SD of mean IBI','Number of IBI > 3SD of mean IBI');
+				else
+					fprintf(fid,'%s\t','dataset','IBI Mean [ms]','IBI SD','VT Mean [l]','VT SD','TTOT Mean [s]','TTOT SD','Number of intervals with one or more missing breathing cycles','Number of intervals with one or more missing IBI','Number of IBI > 1SD of mean IBI','Number of IBI > 2SD of mean IBI','Number of IBI > 3SD of mean IBI');
+				end;
+				fprintf(fid,'\n');
+				fclose(fid);
+      			fid = fopen([pathName,'data_generated_for_rsaToolbox\errorLog.txt'],'a');
+    			fprintf(fid,'%s\n',char(['rsaToolbox v2.0.1 by Stefan M. Schulz <schulz@psychologie.uni-wuerzburg.de> - VivoLogic',char(174),' data import v02:',char(9),datestr(now)]));
+				fprintf(fid,'\n');
+				fclose(fid);
+			end;
+
+			%GET RESPIRATION DATA...
+			event_listString=get(handles.event_list,'String');
+			event_listString=[event_listString;{['Importing ',filename01]}];
+			file01=importdata([pathName,filename01]);
+			file01=struct2cell(file01);
+			respData=file01{1,1};
+			respText=file01{2,1};
+			respTimeA=char(respText{2,3});
+			respTimeA(find(isspace(respTimeA)==1))=[];
+			respTime=[respTimeA;char(respText{3:end,3})];
+			respTime=(str2num(respTime(:,1:2))*60*60*1000)+(str2num(respTime(:,4:5))*60*1000)+(str2num(respTime(:,7:8))*1000)+(str2num(respTime(:,10:12)));
+
+            %'INDEX,YYYY/MM/DD,H: M: S: MS,ViVol,VeVol,Ti,Te,Tt,...'
+            respHeader=char(respText{1,:});
+            respHeader=cellstr(respHeader);
+            respHeader=(strtrim(respHeader'));
+            respHeader3={};
+            for n=1:length(respHeader(1,:))
+                respHeader2=strsplit(respHeader{1,n},',');
+                respHeader3=cat(2,respHeader3,respHeader2);
+            end;
+            respHeader=respHeader3;
+
+  			fid = fopen([pathName,'data_generated_for_rsaToolbox\errorLog.txt'],'a');
+            if find(strcmp('ViVol',respHeader))==4 & find(strcmp('VeVol',respHeader))==5 & find(strcmp('Tt',respHeader))==8
+                fprintf(fid,'%s','Data in file ',filename01,' looks fine.');
+    			fprintf(fid,'\n');
+            else
+      			event_listString=[event_listString;{['WARNING!!! ViVol, VeVol or Tt in file ',filename01,' is NOT in the expected column of your respiration export. Please check your data!' ]}];
+      			event_listString=[event_listString;{['WARNING!!! Program continues but data for ',filename01,' may be incorrect!' ]}];
+                fprintf(fid,'%s','WARNING!!! ViVol, VeVol or Tt in file ',filename01,' is NOT in the expected column of your respiration export. Please check your data!');
+    			fprintf(fid,'\n');
+        		errorLogger=1;
+            end;
+       		fclose(fid);
+            
+            %must match columns in vivologic export!
+            vt=(respData(:,1)+respData(:,2))/2;
+			ttot=respData(:,5);
+
+			if length(respTime(:,1)) > length(ttot)
+				tempNaNs=ones(length(respTime(:,1))-length(ttot));
+				tempNaNs=NaN;
+				vt=[tempNaNs';vt];
+				ttot=[tempNaNs';ttot];
+			end;
+
+			flagTtot=isnan(ttot);
+
+			%restoring missing respiration data, and producing flags to keep track of it
+			for n=(find(isnan(ttot)))';
+				ttot(n,1)=(respTime(n+1,:)-respTime(n,:))/1000;
+			end;
+
+			%GET IBI DATA...
+			event_listString=[event_listString;{['Importing ',filename02]}];
+			file02=importdata([pathName,filename02]);
+			file02=struct2cell(file02);
+			rrData=file02{1,1};
+			rrText=file02{2,1};
+			rrTimeA=char(rrText{2,3});
+			rrTimeA(find(isspace(rrTimeA)==1))=[];
+			rrTime=[rrTimeA;char(rrText{3:end,3})];
+			rrTime=(str2num(rrTime(:,1:2))*60*60*1000)+(str2num(rrTime(:,4:5))*60*1000)+(str2num(rrTime(:,7:8))*1000)+(str2num(rrTime(:,10:12)));
+
+            %'INDEX,YYYY/MM/DD,H: M: S: MS,RR'
+            rrHeader=char(rrText{1,:});
+            rrHeader=cellstr(rrHeader);
+            rrHeader=(strtrim(rrHeader'));
+            rrHeader3={};
+            for n=1:length(rrHeader(1,:))
+                rrHeader2=strsplit(rrHeader{1,n},',');
+                rrHeader3=cat(2,rrHeader3,rrHeader2);
+            end;
+            rrHeader=rrHeader3;
+
+  			fid = fopen([pathName,'data_generated_for_rsaToolbox\errorLog.txt'],'a');
+            if find(strcmp('RR',rrHeader))==4
+                fprintf(fid,'%s','Data in file ',filename02,' looks fine.');
+    			fprintf(fid,'\n');
+            else
+      			event_listString=[event_listString;{['WARNING!!! RR in file ',filename02,' is NOT in the expected column of your EKG/RR export. Please check your data!' ]}];
+      			event_listString=[event_listString;{['WARNING!!! Program continues but data for ',filename02,' may be incorrect!' ]}];
+                fprintf(fid,'%s','WARNING!!! RR in file ',filename02,' is NOT in the expected column of your EKG/RR export. Please check your data!');
+    			fprintf(fid,'\n');
+                errorLogger=1;
+            end;
+       		fclose(fid);
+           
+			ibi=rrData(:,1);
+			if length(rrTime(:,1)) > length(ibi)
+				tempNaNs=ones(length(rrTime(:,1)) > length(ibi));
+				tempNaNs=NaN;
+				ibi=[tempNaNs';ibi];
+			end;
+
+			%restoring missing ibi data, and producing flags to keep track of it
+			rrDataFlag=isnan(ibi);
+			for n=(find(isnan(ibi)))'
+				ibi(n,1)=(rrTime(n+1,:)-rrTime(n,:))/1000;
+			end;
+
+			%SYNCING RESPIRATION AND IBI DATA
+			respTimeStartNum=respTime(find(flagTtot==0),1);
+			respTimeStartNum=(respTimeStartNum(1,1));
+
+			n=1;
+			while rrTime(n,1)<respTime(1,1)
+				n=n+1;
+			end;
+			syncTime=(rrTime(n,1)-respTime(1,1));
+			syncTimeMs=syncTime/1000;
+
+			ibi=ibi(n+1:end,1);
+			ibi=cat(1,syncTimeMs,ibi);
+			rrDataFlag=cat(1,1,rrDataFlag(n+1:end,1));
+
+			%ttot is in sec
+			vt=vt/1000;%l
+			ibi=ibi*1000;%ms
+
+			global expertMode;
+			if expertMode==1
+				if j==1
+					interpolateIBISelection=menu('Interpolate IBI marked as artifact and comprising outliers (> 1, 2, and 3 SD) and create additonal output files?','1 - yes','2 - no');
+				end;
+			else
+				interpolateIBISelection=2;
+			end;
+
+			ibiFlagPos=find(rrDataFlag==1);
+			ibiFlagPos=ibiFlagPos(2:end,:);
+			if ~isempty(ibiFlagPos) & ~isempty(find(rrDataFlag==0))
+				ibiFlagPos1SD=find(ibi(ibiFlagPos)>(mean(ibi(find(rrDataFlag==0)),1)+std(ibi(find(rrDataFlag==0)))));
+				ibiFlagPos2SD=find(ibi(ibiFlagPos)>(mean(ibi(find(rrDataFlag==0)),1)+2*std(ibi(find(rrDataFlag==0)))));
+				ibiFlagPos3SD=find(ibi(ibiFlagPos)>(mean(ibi(find(rrDataFlag==0)),1)+3*std(ibi(find(rrDataFlag==0)))));
+			else
+				ibiFlagPos1SD=[];
+				ibiFlagPos2SD=[];
+				ibiFlagPos3SD=[];
+			end;
+
+			if interpolateIBISelection==1
+			if ~isempty(ibiFlagPos1SD)
+				ibiFlagPos1SD=ibiFlagPos(ibiFlagPos1SD);
+				previousN=1;
+				ibi1SD=[];
+				rrDataFlag1SD=[];
+				for n=1:length(ibiFlagPos1SD)
+					if ibiFlagPos1SD(n) < length(ibi)
+						den=round(ibi(ibiFlagPos1SD(n))/((ibi(ibiFlagPos1SD(n)-1)+ibi(ibiFlagPos1SD(n)+1))/2));
+						ibiDen=round(ibi(ibiFlagPos1SD(n))/den);
+						ibiDenStretch=([1:1:den]*0)+ibiDen;
+%						error1SD(n)=(ibiDen*den)-ibi(ibiFlagPos1SD(n));%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%xxx
+%						error1SD(n)=sum(ibiDenStretch)-ibi(ibiFlagPos1SD(n));%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%xxx
+						if n+1 <= length(ibiFlagPos1SD)
+							if ibiFlagPos1SD(n)+1 < ibiFlagPos1SD(n+1)
+								artifactFreePostIbiDenStretch=ibi(ibiFlagPos1SD(n)+1:ibiFlagPos1SD(n+1)-1);
+								artifactFreePostIbiDenStretchFlag=rrDataFlag(ibiFlagPos1SD(n)+1:ibiFlagPos1SD(n+1)-1);
+							else
+								artifactFreePostIbiDenStretch=[];
+								artifactFreePostIbiDenStretchFlag=[];
+							end;
+						elseif n+1 == length(ibiFlagPos1SD)+1
+							artifactFreePostIbiDenStretch=ibi(ibiFlagPos1SD(n)+1:end);
+							artifactFreePostIbiDenStretchFlag=rrDataFlag(ibiFlagPos1SD(n)+1:end);
+						else
+							artifactFreePostIbiDenStretch=[];
+							artifactFreePostIbiDenStretchFlag=[];
+						end;
+						ibi1SD=cat(1,ibi1SD,[ibi(previousN:ibiFlagPos1SD(n)-1);ibiDenStretch';artifactFreePostIbiDenStretch]);
+						rrDataFlagDenStretch=([1:1:den]*0)+2;
+						rrDataFlag1SD=cat(1,rrDataFlag1SD,[rrDataFlag(previousN:ibiFlagPos1SD(n)-1);rrDataFlagDenStretch';artifactFreePostIbiDenStretchFlag]);
+						previousN=length(ibi1SD)+1;
+					end;
+				end;
+%				sum(error1SD);%%%%%%%%%%%%%%%%%xxx
+				ibi1SD=cat(1,ibi1SD,ibi(previousN:end));
+				rrDataFlag1SD=cat(1,rrDataFlag1SD,rrDataFlag(previousN:end));
+				dlmwrite([pathName,'data_generated_for_rsaToolbox\',filePrefix01,'_1SD_IBI.csv'],ibi1SD,'\t');
+				dlmwrite([pathName,'data_generated_for_rsaToolbox\',filePrefix01,'_1SD_IBIflag.csv'],rrDataFlag1SD,'\t');
+				event_listString=[event_listString;{[num2str(length(find(rrDataFlag1SD==2))-(length(find(rrDataFlag==1))-1)),' intervals were added because the ibi was more than 1SD longer than expected.']}];
+			end;
+			if ~isempty(ibiFlagPos2SD)
+				ibiFlagPos2SD=ibiFlagPos(ibiFlagPos2SD);
+				previousN=1;
+				ibi2SD=[];
+				rrDataFlag2SD=[];
+				for n=1:length(ibiFlagPos2SD)
+					if ibiFlagPos2SD(n) < length(ibi)
+						den=round(ibi(ibiFlagPos2SD(n))/((ibi(ibiFlagPos2SD(n)-1)+ibi(ibiFlagPos2SD(n)+1))/2));
+						ibiDen=round(ibi(ibiFlagPos2SD(n))/den);
+						ibiDenStretch=([1:1:den]*0)+ibiDen;
+%						error2SD(n)=(ibiDen*den)-ibi(ibiFlagPos2SD(n));%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%xxx
+%						error2SD(n)=sum(ibiDenStretch)-ibi(ibiFlagPos2SD(n));%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%xxx
+						if n+1 <= length(ibiFlagPos2SD)
+							if ibiFlagPos2SD(n)+1 < ibiFlagPos2SD(n+1)
+								artifactFreePostIbiDenStretch=ibi(ibiFlagPos2SD(n)+1:ibiFlagPos2SD(n+1)-1);
+								artifactFreePostIbiDenStretchFlag=rrDataFlag(ibiFlagPos2SD(n)+1:ibiFlagPos2SD(n+1)-1);
+							else
+								artifactFreePostIbiDenStretch=[];
+								artifactFreePostIbiDenStretchFlag=[];
+							end;
+						elseif n+1 == length(ibiFlagPos2SD)+1
+							artifactFreePostIbiDenStretch=ibi(ibiFlagPos2SD(n)+1:end);
+							artifactFreePostIbiDenStretchFlag=rrDataFlag(ibiFlagPos2SD(n)+1:end);
+						else
+							artifactFreePostIbiDenStretch=[];
+							artifactFreePostIbiDenStretchFlag=[];
+						end;
+						ibi2SD=cat(1,ibi2SD,[ibi(previousN:ibiFlagPos2SD(n)-1);ibiDenStretch';artifactFreePostIbiDenStretch]);
+						rrDataFlagDenStretch=([1:1:den]*0)+2;
+						rrDataFlag2SD=cat(1,rrDataFlag2SD,[rrDataFlag(previousN:ibiFlagPos2SD(n)-1);rrDataFlagDenStretch';artifactFreePostIbiDenStretchFlag]);
+						previousN=length(ibi2SD)+1;
+					end;
+				end;
+%				sum(error2SD);%%%%%%%%%%%%%%%%%xxx
+				ibi2SD=cat(1,ibi2SD,ibi(previousN:end));
+				rrDataFlag2SD=cat(1,rrDataFlag2SD,rrDataFlag(previousN:end));
+				dlmwrite([pathName,'data_generated_for_rsaToolbox\',filePrefix01,'_2SD_IBI.csv'],ibi2SD,'\t');
+				dlmwrite([pathName,'data_generated_for_rsaToolbox\',filePrefix01,'_2SD_IBIflag.csv'],rrDataFlag2SD,'\t');
+				event_listString=[event_listString;{[num2str(length(find(rrDataFlag2SD==2))-(length(find(rrDataFlag==1))-1)),' intervals were added because the ibi was more than 2SD longer than expected.']}];
+			end;
+			if ~isempty(ibiFlagPos3SD)
+				ibiFlagPos3SD=ibiFlagPos(ibiFlagPos3SD);
+				previousN=1;
+				ibi3SD=[];
+				rrDataFlag3SD=[];
+				for n=1:length(ibiFlagPos3SD)
+					if ibiFlagPos3SD(n) < length(ibi)
+						den=round(ibi(ibiFlagPos3SD(n))/((ibi(ibiFlagPos3SD(n)-1)+ibi(ibiFlagPos3SD(n)+1))/2));
+						ibiDen=round(ibi(ibiFlagPos3SD(n))/den);
+						ibiDenStretch=([1:1:den]*0)+ibiDen;
+%						error3SD(n)=(ibiDen*den)-ibi(ibiFlagPos3SD(n));%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%xxx
+%						error3SD(n)=sum(ibiDenStretch)-ibi(ibiFlagPos3SD(n));%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%xxx
+						if n+1 <= length(ibiFlagPos3SD)
+							if ibiFlagPos3SD(n)+1 < ibiFlagPos3SD(n+1)
+								artifactFreePostIbiDenStretch=ibi(ibiFlagPos3SD(n)+1:ibiFlagPos3SD(n+1)-1);
+								artifactFreePostIbiDenStretchFlag=rrDataFlag(ibiFlagPos3SD(n)+1:ibiFlagPos3SD(n+1)-1);
+							else
+								artifactFreePostIbiDenStretch=[];
+								artifactFreePostIbiDenStretchFlag=[];
+							end;
+						elseif n+1 == length(ibiFlagPos3SD)+1
+							artifactFreePostIbiDenStretch=ibi(ibiFlagPos3SD(n)+1:end);
+							artifactFreePostIbiDenStretchFlag=rrDataFlag(ibiFlagPos3SD(n)+1:end);
+						else
+						artifactFreePostIbiDenStretch=[];
+						artifactFreePostIbiDenStretchFlag=[];
+						end;
+						ibi3SD=cat(1,ibi3SD,[ibi(previousN:ibiFlagPos3SD(n)-1);ibiDenStretch';artifactFreePostIbiDenStretch]);
+						rrDataFlagDenStretch=([1:1:den]*0)+2;
+						rrDataFlag3SD=cat(1,rrDataFlag3SD,[rrDataFlag(previousN:ibiFlagPos3SD(n)-1);rrDataFlagDenStretch';artifactFreePostIbiDenStretchFlag]);
+						previousN=length(ibi3SD)+1;
+					end;
+				end;
+%				sum(error3SD);%%%%%%%%%%%%%%%%%xxx
+				ibi3SD=cat(1,ibi3SD,ibi(previousN:end));
+				rrDataFlag3SD=cat(1,rrDataFlag3SD,rrDataFlag(previousN:end));
+				dlmwrite([pathName,'data_generated_for_rsaToolbox\',filePrefix01,'_3SD_IBI.csv'],ibi3SD,'\t');
+				dlmwrite([pathName,'data_generated_for_rsaToolbox\',filePrefix01,'_3SD_IBIflag.csv'],rrDataFlag3SD,'\t');
+				event_listString=[event_listString;{[num2str(length(find(rrDataFlag3SD==2))-(length(find(rrDataFlag==1))-1)),' intervals were added because the ibi was more than 3SD longer than expected.']}];
+			end;
+			end;
+
+			dlmwrite([pathName,'data_generated_for_rsaToolbox\',filePrefix01,'_TTOT.csv'],ttot,'\t');
+			dlmwrite([pathName,'data_generated_for_rsaToolbox\',filePrefix01,'_VT.csv'],vt,'\t');
+			dlmwrite([pathName,'data_generated_for_rsaToolbox\',filePrefix01,'_IBI.csv'],ibi,'\t');
+			event_listString=[event_listString;{['Saving TTOT [s], VT [l], IBI [ms] to separate files at ',pathName,'data_generated_for_rsaToolbox\']}];
+			event_listString=[event_listString;{['Saving ',filePrefix01,'_TTOT.csv']}];
+			event_listString=[event_listString;{['Saving ',filePrefix01,'_VT.csv']}];
+			event_listString=[event_listString;{['Saving ',filePrefix01,'_IBI.csv']}];
+
+			dlmwrite([pathName,'data_generated_for_rsaToolbox\',filePrefix01,'_IBIflag.csv'],rrDataFlag,'\t');
+			event_listString=[event_listString;{['Saving information about missing ibi (flag: 1=missing) at ',pathName,'data_generated_for_rsaToolbox\']}];
+			event_listString=[event_listString;{['Saving ',filePrefix01,'_IBIflag.csv']}];
+
+			dlmwrite([pathName,'data_generated_for_rsaToolbox\',filePrefix01,'_TTOTflag.csv'],flagTtot,'\t');
+			event_listString=[event_listString;{['Saving information about missing breathing cycles (flag: 1=missing) at ',pathName,'data_generated_for_rsaToolbox\']}];
+			event_listString=[event_listString;{['Saving ',filePrefix01,'_TTOTflag.csv']}];
+
+			fid = fopen([pathName,'data_generated_for_rsaToolbox\description.txt'],'a');
+			fprintf(fid,'%s\t',pathName);
+			fprintf(fid,'%s\t',tmpBatchFileSavename);
+			if noOfFilenameElements>0
+				fprintf(fid,'%s\t',tmpBatchFileSavenamePrint);
+			end;
+			fprintf(fid,'%s\t',num2str(mean(ibi(find(rrDataFlag==0),1))));
+			fprintf(fid,'%s\t',num2str(std(ibi(find(rrDataFlag==0),1))));
+			fprintf(fid,'%s\t',num2str(num2str(mean(vt(find(flagTtot==0),1)))));
+			fprintf(fid,'%s\t',num2str(std(vt(find(flagTtot==0),1))));
+			fprintf(fid,'%s\t',num2str(mean(ttot(find(flagTtot==0),1))));
+			fprintf(fid,'%s\t',num2str(std(ttot(find(flagTtot==0),1))));
+			fprintf(fid,'%s\t',num2str(length(find(flagTtot==1))));
+			fprintf(fid,'%s\t',num2str(length(find(rrDataFlag==1))-1));
+			fprintf(fid,'%s\t',num2str(length(ibiFlagPos1SD)));
+%			fprintf(fid,'%s\t',num2str(length(find(rrDataFlag1SD==2)))-(length(find(rrDataFlag==1))-1));
+			fprintf(fid,'%s\t',num2str(length(ibiFlagPos2SD)));
+%			fprintf(fid,'%s\t',num2str(length(find(rrDataFlag2SD==2)))-(length(find(rrDataFlag==1))-1));
+			fprintf(fid,'%s\t',num2str(length(ibiFlagPos3SD)));
+%			fprintf(fid,'%s\t',num2str(length(find(rrDataFlag3SD==2)))-(length(find(rrDataFlag==1))-1));
+			fprintf(fid,'\n');
+			fclose(fid);
+
+			event_listString=[event_listString;{'______________________________________________________________________'}];
+			event_listString=[event_listString;{['Descriptive overview of the data based on valid information in files with prefix ',filePrefix01,':']}];
+			event_listString=[event_listString;{['IBI [ms]: M=',num2str(mean(ibi(find(rrDataFlag~=1),1))),', SD=',num2str(std(ibi(find(rrDataFlag~=1),1)))]}];
+			event_listString=[event_listString;{['VT   [l]: M=',num2str(mean(vt(find(flagTtot~=1),1))),', SD=',num2str(std(vt(find(flagTtot~=1),1)))]}];
+			event_listString=[event_listString;{['TTOT [s]: M=',num2str(mean(ttot(find(flagTtot~=1),1))),', SD=',num2str(std(ttot(find(flagTtot~=1),1)))]}];
+			event_listString=[event_listString;{['There are ',num2str(length(find(flagTtot==1))),' intervals with one or more missing breathing cycles.']}];
+			event_listString=[event_listString;{['There are ',num2str(length(find(rrDataFlag==1))-1),' intervals with one or more missing ibi.']}];
+			event_listString=[event_listString;{'______________________________________________________________________'}];
+			set(handles.event_list,'String',event_listString);
+			sTemp=size(event_listString);
+			set(handles.event_list,'Value',sTemp(1,1));
+			guidata(hObject,handles);
+		end;
+	end;
+	event_listString=get(handles.event_list,'String');
+	event_listString=[event_listString;{'WARNING: Do not use these files to compute means etc. for IBI, VT or TTOT!'}];
+	event_listString=[event_listString;{'This import filter automatically fills in missing data and adds information'}];
+	event_listString=[event_listString;{'to allow rsaToolbox to exhaust the given information.'}];
+	event_listString=[event_listString;{' '}];
+    if errorLogger_Resp==0 & errorLogger_RR==0
+        event_listString=[event_listString;{['Import filter for VivoLogic',char(174),' data export v02 - terminated succesfully.']}];
+    else
+    	event_listString=[event_listString;{['Import filter for VivoLogic',char(174),' data export v02 - procdure complete.']}];
+    	event_listString=[event_listString;{[' ']}];
+    	event_listString=[event_listString;{['WARNING!!! There have been errors. Check the log in the Event Monitor!']}];
+    end;
+    
+    event_listString=[event_listString;{'______________________________________________________________________'}];
+	set(handles.event_list,'String',event_listString);
+	sTemp=size(event_listString);
+	set(handles.event_list,'Value',sTemp(1,1));
+	guidata(hObject,handles);
+    
+% --------------------------------------------------------------------
+function vivosenseImport_v01_Callback(hObject, eventdata, handles)
+% hObject	handle to vivosenseImport_v01 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles	structure with handles and user data (see GUIDATA)
+	event_listString=get(handles.event_list,'String');
+	event_listString=[event_listString;{['Import filter for Vivonoetics',char(174),' VivoSense',char(174),' data export v01. - Copyright ',char(169),' 2013 by Stefan M. Schulz']}];
+	event_listString=[event_listString;{'______________________________________________________________________'}];
+	event_listString=[event_listString;{'Quick Reference:'}];
+	event_listString=[event_listString;{'Two exports are required to use this tool:'}];
+	event_listString=[event_listString;{'The EKG R-peak (RR) export file has to include the following columns:'}];
+	event_listString=[event_listString;{'Index,Timestamp,RR,...'}];
+	event_listString=[event_listString;{'The respiration export file has to include the following columns:'}];
+	event_listString=[event_listString;{'Index,Timestamp,Insp Vol,Exp Vol,Vent,Vt/Ti,Resp Rate,Te,Ti,Ti/Te,Ti/Tt,Tpef/Te,Tt,...'}];
+	event_listString=[event_listString;{'Exports must be saved in CSV format!'}];
+	event_listString=[event_listString;{'Note that the files should never contain additional data!'}];
+	event_listString=[event_listString;{'Internal format (i.e. column assignment) is crucial for proper function!'}];
+	event_listString=[event_listString;{'The last 12 characters of Timestamp must comply with the following format: 10:50:18.349'}];
+	event_listString=[event_listString;{'Note that the exported data is converted to the following units:'}];
+	event_listString=[event_listString;{'IBI [ms], VT [ml], TTOT [sec].'}];
+	event_listString=[event_listString;{'______________________________________________________________________'}];
+	set(handles.event_list,'String',event_listString);
+	sTemp=size(event_listString);
+	set(handles.event_list,'Value',sTemp(1,1));
+	guidata(hObject,handles);
+    errorLogger_Resp=0;
+    errorLogger_RR=0;
+
+	[fileName,pathName] = uigetfile({'*.csv','comma delimited files (*.csv)'},['Select any file from batch list.']);
+	if isequal([fileName,pathName],[0,0])
+		batchList=fileName;
+		event_listString=get(handles.event_list,'String');
+		event_listString=[event_listString;{'Please, select a valid file.'}];
+		event_listString=[event_listString;{['VivoSense',char(174),' data import v01 aborts.']}];
+		event_listString=[event_listString;{'______________________________________________________________________'}];
+		set(handles.event_list,'String',event_listString);
+		sTemp=size(event_listString);
+		set(handles.event_list,'Value',sTemp(1,1));
+		guidata(hObject,handles);
+		return
+		% Otherwise construct the fullfilename and Check and load the file.
+	else
+		%analyse filenames
+		cd(pathName);
+		dateienResp=dir('*_Resp.csv');
+		dateienRR=dir('*_RR.csv');
+
+		for i=1:length(dateienResp)
+
+			fileResp=getfield(dateienResp(i,1),'name');
+			filePrefixResp=fileResp(1:end-9);
+			fileRR=getfield(dateienRR(i,1),'name');
+			filePrefixRR=fileRR(1:end-7);
+
+			if length(filePrefixResp)==length(filePrefixRR) & filePrefixResp==filePrefixRR
+			else
+				event_listString=get(handles.event_list,'String');
+				event_listString=[event_listString;{'Inconsistencies in batch file list found.'}];
+				event_listString=[event_listString;{['VivoSense',char(174),' data import v01 aborts. - please check your data!']}];
+				event_listString=[event_listString;{'______________________________________________________________________'}];
+				set(handles.event_list,'String',event_listString);
+				sTemp=size(event_listString);
+				set(handles.event_list,'Value',sTemp(1,1));
+				guidata(hObject,handles);
+				return
+			end;
+		end;
+		batchList=dateienResp;
+		event_listString=get(handles.event_list,'String');
+		event_listString=[event_listString;{'File list for batch processing successfully created.'}];
+		cd(pathName);
+		event_listString=[event_listString;{['Data will be imported from ',pathName]}];
+		warning off MATLAB:MKDIR:DirectoryExists;
+		mkdir('data_generated_for_rsaToolbox');
+		event_listString=[event_listString;{['Data will be saved to ',pathName,'data_generated_for_rsaToolbox\..']}];
+		event_listString=[event_listString;{['Check file ',pathName,'data_generated_for_rsaToolbox\description.txt for a summary of descriptive information.']}];
+		event_listString=[event_listString;{'______________________________________________________________________'}];
+		set(handles.event_list,'String',event_listString);
+		sTemp=size(event_listString);
+		set(handles.event_list,'Value',sTemp(1,1));
+		guidata(hObject,handles);
+
+		for j=1:length(batchList)
+
+			filename01=getfield(batchList(j,1),'name');
+			filePrefix01=filename01(1:end-9);
+			filename02=[filePrefix01,'_RR.csv'];
+
+			tmpBatchFileSavename=filePrefix01;
+			noOfFilenameElements=0;
+			global splitFilename;
+			global answer;
+			switch splitFilename
+				case 0
+				case 1
+					aC=find(~isstrprop(tmpBatchFileSavename,'alphanum'));
+					bC=aC(1,find(diff(find(~isstrprop(tmpBatchFileSavename,'alphanum')))==1));
+					if ~isempty(bC)
+						tmpBatchFileSavename(bC)=[];
+					end;
+					noOfFilenameElements=length(find(~isstrprop(tmpBatchFileSavename,'alphanum')));
+					tmpBatchFileSavenamePrint=tmpBatchFileSavename;
+					tmpBatchFileSavenamePrint(~isstrprop(tmpBatchFileSavename,'alphanum'))=char(9);
+				case 2
+					aC=find(ismember(tmpBatchFileSavename,char(answer)));
+					bC=aC(1,find(diff(find(ismember(tmpBatchFileSavename,char(answer))))==1));
+					if ~isempty(bC)
+						tmpBatchFileSavename(bC)=[];
+					end;
+					noOfFilenameElements=length(find(ismember(tmpBatchFileSavename,char(answer))));
+					tmpBatchFileSavenamePrint=tmpBatchFileSavename;
+					tmpBatchFileSavenamePrint(ismember(tmpBatchFileSavename,char(answer)))=char(9);
+			end;
+
+			if j==1
+				fid = fopen([pathName,'data_generated_for_rsaToolbox\description.txt'],'a');
+				fprintf(fid,'%s\n',char(['rsaToolbox v2.0.1 by Stefan M. Schulz <schulz@psychologie.uni-wuerzburg.de> - VivoSense',char(174),' data import v01:',char(9),datestr(now)]));
+				fprintf(fid,'%s\t','data folder');
+				if noOfFilenameElements>0
+					fprintf(fid,'%s\t','dataset');
+					for nFilenameElements=1:noOfFilenameElements+1
+						fprintf(fid,'%s\t',['filename part ',num2str(nFilenameElements)]);
+					end;
+					fprintf(fid,'%s\t','IBI Mean [ms]','IBI SD','VT Mean [l]','VT SD','TTOT Mean [s]','TTOT SD','Number of intervals with one or more missing breathing cycles','Number of intervals with one or more missing IBI','Number of IBI > 1SD of mean IBI','Number of IBI > 2SD of mean IBI','Number of IBI > 3SD of mean IBI');
+				else
+					fprintf(fid,'%s\t','dataset','IBI Mean [ms]','IBI SD','VT Mean [l]','VT SD','TTOT Mean [s]','TTOT SD','Number of intervals with one or more missing breathing cycles','Number of intervals with one or more missing IBI','Number of IBI > 1SD of mean IBI','Number of IBI > 2SD of mean IBI','Number of IBI > 3SD of mean IBI');
+				end;
+				fprintf(fid,'\n');
+				fclose(fid);
+      			fid = fopen([pathName,'data_generated_for_rsaToolbox\errorLog.txt'],'a');
+    			fprintf(fid,'%s',char(['rsaToolbox v2.0.1 by Stefan M. Schulz <schulz@psychologie.uni-wuerzburg.de> - VivoSense',char(174),' data import v01:',char(9),datestr(now)]));
+				fprintf(fid,'\n');
+				fclose(fid);
+			end;
+
+			%GET RESPIRATION DATA...
+			event_listString=get(handles.event_list,'String');
+			event_listString=[event_listString;{['Importing ',filename01]}];
+			file01=importdata([pathName,filename01]);
+			file01=struct2cell(file01);
+			respData=file01{1,1};
+			respText=file01{2,1};
+			respTimeA=char(respText{2:end,2});
+			respTimeA=respTimeA(:,length(respTimeA(1,:))-11:end);
+			respTime=(str2num(respTimeA(:,1:2))*60*60*1000)+(str2num(respTimeA(:,4:5))*60*1000)+(str2num(respTimeA(:,7:end))*1000);
+
+        	%'Index,Timestamp,Insp Vol,Exp Vol,Vent,Vt/Ti,Resp Rate,Te,Ti,Ti/Te,Ti/Tt,Tpef/Te,Tt,...'
+            respHeader=char(respText{1,:});
+            respHeader=cellstr(respHeader);
+            respHeader=(strtrim(respHeader'));
+            respHeader3={};
+            for n=1:length(respHeader(1,:))
+                respHeader2=strsplit(respHeader{1,n},',');
+                respHeader3=cat(2,respHeader3,respHeader2);
+            end;
+            respHeader=respHeader3;
+
+  			fid = fopen([pathName,'data_generated_for_rsaToolbox\errorLog.txt'],'a');
+            if find(strcmp('Insp Vol',respHeader))==3 & find(strcmp('Exp Vol',respHeader))==4 & find(strcmp('Tt',respHeader))==13
+                fprintf(fid,'%s','Data in file ',filename01,' looks fine.');
+    			fprintf(fid,'\n');
+            else
+                event_listString=[event_listString;{['WARNING!!! "Insp Vol", "Exp Vol" or "Tt" in file ',filename01,' is NOT in the expected column of your respiration export. Please check your data!' ]}];
+      			event_listString=[event_listString;{['WARNING!!! Program continues but data for ',filename01,' may be incorrect!' ]}];
+                fprintf(fid,'%s','WARNING!!! "Insp Vol", "Exp Vol" or "Tt" in file ',filename01,' is NOT in the expected column of your respiration export. Please check your data!');
+    			fprintf(fid,'\n');
+                errorLogger_Resp=1;
+            end;
+       		fclose(fid);
+
+			vt=(respData(:,1)+respData(:,2))/2;
+			ttot=respData(:,11);
+
+			if length(respTime(:,1)) > length(ttot)
+				tempNaNs=ones(length(respTime(:,1))-length(ttot));
+				tempNaNs=NaN;
+				vt=[tempNaNs';vt];
+				ttot=[tempNaNs';ttot];
+			end;
+
+			flagTtot=isnan(ttot);
+
+			%restoring missing respiration data, and producing flags to keep track of it
+			for n=(find(isnan(ttot)))';
+				ttot(n,1)=(respTime(n+1,:)-respTime(n,:))/1000;
+			end;
+
+			%GET IBI DATA...
+			event_listString=[event_listString;{['Importing ',filename02]}];
+			file02=importdata([pathName,filename02]);
+			file02=struct2cell(file02);
+			rrData=file02{1,1};
+			rrText=file02{2,1};
+			rrTimeA=char(rrText{2:end,2});
+			rrTimeA=rrTimeA(:,length(rrTimeA(1,:))-11:end);
+			rrTime=(str2num(rrTimeA(:,1:2))*60*60*1000)+(str2num(rrTimeA(:,4:5))*60*1000)+(str2num(rrTimeA(:,7:end))*1000);
+
+            %'Index,Timestamp,RR,...'
+            rrHeader=char(rrText{1,:});
+            rrHeader=cellstr(rrHeader);
+            rrHeader=(strtrim(rrHeader'));
+            rrHeader3={};
+            for n=1:length(rrHeader(1,:))
+                rrHeader2=strsplit(rrHeader{1,n},',');
+                rrHeader3=cat(2,rrHeader3,rrHeader2);
+            end;
+            rrHeader=rrHeader3;
+
+  			fid = fopen([pathName,'data_generated_for_rsaToolbox\errorLog.txt'],'a');
+            if find(strcmp('RR',rrHeader))==3
+                fprintf(fid,'%s','Data in file ',filename02,' looks fine.');
+    			fprintf(fid,'\n');
+            else
+                event_listString=[event_listString;{['WARNING!!! RR in file ',filename02,' is NOT in the expected column of your EKG/RR export. Please check your data!' ]}];
+      			event_listString=[event_listString;{['WARNING!!! Program continues but data for ',filename02,' may be incorrect!' ]}];
+                fprintf(fid,'%s','WARNING!!! RR in file ',filename02,' is NOT in the expected column of your EKG/RR export. Please check your data!');
+    			fprintf(fid,'\n');
+                errorLogger_RR=1;
+            end;
+       		fclose(fid);
+
+            ibi=rrData(:,1);
+			if length(rrTime(:,1)) > length(ibi)
+				tempNaNs=ones(length(rrTime(:,1)) > length(ibi));
+				tempNaNs=NaN;
+				ibi=[tempNaNs';ibi];
+			end;
+
+			%restoring missing ibi data, and producing flags to keep track of it
+			rrDataFlag=isnan(ibi);
+			for n=(find(isnan(ibi)))'
+				ibi(n,1)=(rrTime(n+1,:)-rrTime(n,:))/1000;
+			end;
+
+			%SYNCING RESPIRATION AND IBI DATA
+			respTimeStartNum=respTime(find(flagTtot==0),1);
+			respTimeStartNum=(respTimeStartNum(1,1));
+
+			n=1;
+			while rrTime(n,1)<respTime(1,1)
+				n=n+1;
+			end;
+			syncTime=(rrTime(n,1)-respTime(1,1));
+			syncTimeMs=syncTime/1000;
+
+			ibi=ibi(n+1:end,1);
+			ibi=cat(1,syncTimeMs,ibi);
+			rrDataFlag=cat(1,1,rrDataFlag(n+1:end,1));
+
+			%ttot is in sec
+			vt=vt/1000;%l
+			ibi=ibi*1000;%ms
+
+			global expertMode;
+			if expertMode==1
+				if j==1
+					interpolateIBISelection=menu('Interpolate IBI marked as artifact and comprising outliers (> 1, 2, and 3 SD) and create additonal output files?','1 - yes','2 - no');
+				end;
+			else
+				interpolateIBISelection=2;
+			end;
+
+			ibiFlagPos=find(rrDataFlag==1);
+			ibiFlagPos=ibiFlagPos(2:end,:);
+			if ~isempty(ibiFlagPos) & ~isempty(find(rrDataFlag==0))
+				ibiFlagPos1SD=find(ibi(ibiFlagPos)>(mean(ibi(find(rrDataFlag==0)),1)+std(ibi(find(rrDataFlag==0)))));
+				ibiFlagPos2SD=find(ibi(ibiFlagPos)>(mean(ibi(find(rrDataFlag==0)),1)+2*std(ibi(find(rrDataFlag==0)))));
+				ibiFlagPos3SD=find(ibi(ibiFlagPos)>(mean(ibi(find(rrDataFlag==0)),1)+3*std(ibi(find(rrDataFlag==0)))));
+            else
+                ibiFlagPos1SD=[];
+                ibiFlagPos2SD=[];
+                ibiFlagPos3SD=[];
+            end;
+
+			if interpolateIBISelection==1
+			if ~isempty(ibiFlagPos1SD)
+				ibiFlagPos1SD=ibiFlagPos(ibiFlagPos1SD);
+				previousN=1;
+				ibi1SD=[];
+				rrDataFlag1SD=[];
+				for n=1:length(ibiFlagPos1SD)
+					if ibiFlagPos1SD(n) < length(ibi)
+						den=round(ibi(ibiFlagPos1SD(n))/((ibi(ibiFlagPos1SD(n)-1)+ibi(ibiFlagPos1SD(n)+1))/2));
+						ibiDen=round(ibi(ibiFlagPos1SD(n))/den);
+						ibiDenStretch=([1:1:den]*0)+ibiDen;
+%						error1SD(n)=(ibiDen*den)-ibi(ibiFlagPos1SD(n));%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%xxx
+%						error1SD(n)=sum(ibiDenStretch)-ibi(ibiFlagPos1SD(n));%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%xxx
+						if n+1 <= length(ibiFlagPos1SD)
+							if ibiFlagPos1SD(n)+1 < ibiFlagPos1SD(n+1)
+								artifactFreePostIbiDenStretch=ibi(ibiFlagPos1SD(n)+1:ibiFlagPos1SD(n+1)-1);
+								artifactFreePostIbiDenStretchFlag=rrDataFlag(ibiFlagPos1SD(n)+1:ibiFlagPos1SD(n+1)-1);
+							else
+								artifactFreePostIbiDenStretch=[];
+								artifactFreePostIbiDenStretchFlag=[];
+							end;
+						elseif n+1 == length(ibiFlagPos1SD)+1
+							artifactFreePostIbiDenStretch=ibi(ibiFlagPos1SD(n)+1:end);
+							artifactFreePostIbiDenStretchFlag=rrDataFlag(ibiFlagPos1SD(n)+1:end);
+						else
+							artifactFreePostIbiDenStretch=[];
+							artifactFreePostIbiDenStretchFlag=[];
+						end;
+						ibi1SD=cat(1,ibi1SD,[ibi(previousN:ibiFlagPos1SD(n)-1);ibiDenStretch';artifactFreePostIbiDenStretch]);
+						rrDataFlagDenStretch=([1:1:den]*0)+2;
+						rrDataFlag1SD=cat(1,rrDataFlag1SD,[rrDataFlag(previousN:ibiFlagPos1SD(n)-1);rrDataFlagDenStretch';artifactFreePostIbiDenStretchFlag]);
+						previousN=length(ibi1SD)+1;
+					end;
+				end;
+%				sum(error1SD);%%%%%%%%%%%%%%%%%xxx
+				ibi1SD=cat(1,ibi1SD,ibi(previousN:end));
+				rrDataFlag1SD=cat(1,rrDataFlag1SD,rrDataFlag(previousN:end));
+				dlmwrite([pathName,'data_generated_for_rsaToolbox\',filePrefix01,'_1SD_IBI.csv'],ibi1SD,'\t');
+				dlmwrite([pathName,'data_generated_for_rsaToolbox\',filePrefix01,'_1SD_IBIflag.csv'],rrDataFlag1SD,'\t');
+				event_listString=[event_listString;{[num2str(length(find(rrDataFlag1SD==2))-(length(find(rrDataFlag==1))-1)),' intervals were added because the ibi was more than 1SD longer than expected.']}];
+			end;
+			if ~isempty(ibiFlagPos2SD)
+				ibiFlagPos2SD=ibiFlagPos(ibiFlagPos2SD);
+				previousN=1;
+				ibi2SD=[];
+				rrDataFlag2SD=[];
+				for n=1:length(ibiFlagPos2SD)
+					if ibiFlagPos2SD(n) < length(ibi)
+						den=round(ibi(ibiFlagPos2SD(n))/((ibi(ibiFlagPos2SD(n)-1)+ibi(ibiFlagPos2SD(n)+1))/2));
+						ibiDen=round(ibi(ibiFlagPos2SD(n))/den);
+						ibiDenStretch=([1:1:den]*0)+ibiDen;
+%						error2SD(n)=(ibiDen*den)-ibi(ibiFlagPos2SD(n));%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%xxx
+%						error2SD(n)=sum(ibiDenStretch)-ibi(ibiFlagPos2SD(n));%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%xxx
+						if n+1 <= length(ibiFlagPos2SD)
+							if ibiFlagPos2SD(n)+1 < ibiFlagPos2SD(n+1)
+								artifactFreePostIbiDenStretch=ibi(ibiFlagPos2SD(n)+1:ibiFlagPos2SD(n+1)-1);
+								artifactFreePostIbiDenStretchFlag=rrDataFlag(ibiFlagPos2SD(n)+1:ibiFlagPos2SD(n+1)-1);
+							else
+								artifactFreePostIbiDenStretch=[];
+								artifactFreePostIbiDenStretchFlag=[];
+							end;
+						elseif n+1 == length(ibiFlagPos2SD)+1
+							artifactFreePostIbiDenStretch=ibi(ibiFlagPos2SD(n)+1:end);
+							artifactFreePostIbiDenStretchFlag=rrDataFlag(ibiFlagPos2SD(n)+1:end);
+						else
+							artifactFreePostIbiDenStretch=[];
+							artifactFreePostIbiDenStretchFlag=[];
+						end;
+						ibi2SD=cat(1,ibi2SD,[ibi(previousN:ibiFlagPos2SD(n)-1);ibiDenStretch';artifactFreePostIbiDenStretch]);
+						rrDataFlagDenStretch=([1:1:den]*0)+2;
+						rrDataFlag2SD=cat(1,rrDataFlag2SD,[rrDataFlag(previousN:ibiFlagPos2SD(n)-1);rrDataFlagDenStretch';artifactFreePostIbiDenStretchFlag]);
+						previousN=length(ibi2SD)+1;
+					end;
+				end;
+%				sum(error2SD);%%%%%%%%%%%%%%%%%xxx
+				ibi2SD=cat(1,ibi2SD,ibi(previousN:end));
+				rrDataFlag2SD=cat(1,rrDataFlag2SD,rrDataFlag(previousN:end));
+				dlmwrite([pathName,'data_generated_for_rsaToolbox\',filePrefix01,'_2SD_IBI.csv'],ibi2SD,'\t');
+				dlmwrite([pathName,'data_generated_for_rsaToolbox\',filePrefix01,'_2SD_IBIflag.csv'],rrDataFlag2SD,'\t');
+				event_listString=[event_listString;{[num2str(length(find(rrDataFlag2SD==2))-(length(find(rrDataFlag==1))-1)),' intervals were added because the ibi was more than 2SD longer than expected.']}];
+			end;
+			if ~isempty(ibiFlagPos3SD)
+				ibiFlagPos3SD=ibiFlagPos(ibiFlagPos3SD);
+				previousN=1;
+				ibi3SD=[];
+				rrDataFlag3SD=[];
+				for n=1:length(ibiFlagPos3SD)
+					if ibiFlagPos3SD(n) < length(ibi)
+						den=round(ibi(ibiFlagPos3SD(n))/((ibi(ibiFlagPos3SD(n)-1)+ibi(ibiFlagPos3SD(n)+1))/2));
+						ibiDen=round(ibi(ibiFlagPos3SD(n))/den);
+						ibiDenStretch=([1:1:den]*0)+ibiDen;
+%						error3SD(n)=(ibiDen*den)-ibi(ibiFlagPos3SD(n));%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%xxx
+%						error3SD(n)=sum(ibiDenStretch)-ibi(ibiFlagPos3SD(n));%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%xxx
+						if n+1 <= length(ibiFlagPos3SD)
+							if ibiFlagPos3SD(n)+1 < ibiFlagPos3SD(n+1)
+								artifactFreePostIbiDenStretch=ibi(ibiFlagPos3SD(n)+1:ibiFlagPos3SD(n+1)-1);
+								artifactFreePostIbiDenStretchFlag=rrDataFlag(ibiFlagPos3SD(n)+1:ibiFlagPos3SD(n+1)-1);
+							else
+								artifactFreePostIbiDenStretch=[];
+								artifactFreePostIbiDenStretchFlag=[];
+							end;
+						elseif n+1 == length(ibiFlagPos3SD)+1
+							artifactFreePostIbiDenStretch=ibi(ibiFlagPos3SD(n)+1:end);
+							artifactFreePostIbiDenStretchFlag=rrDataFlag(ibiFlagPos3SD(n)+1:end);
+						else
+						artifactFreePostIbiDenStretch=[];
+						artifactFreePostIbiDenStretchFlag=[];
+						end;
+						ibi3SD=cat(1,ibi3SD,[ibi(previousN:ibiFlagPos3SD(n)-1);ibiDenStretch';artifactFreePostIbiDenStretch]);
+						rrDataFlagDenStretch=([1:1:den]*0)+2;
+						rrDataFlag3SD=cat(1,rrDataFlag3SD,[rrDataFlag(previousN:ibiFlagPos3SD(n)-1);rrDataFlagDenStretch';artifactFreePostIbiDenStretchFlag]);
+						previousN=length(ibi3SD)+1;
+					end;
+				end;
+%				sum(error3SD);%%%%%%%%%%%%%%%%%xxx
+				ibi3SD=cat(1,ibi3SD,ibi(previousN:end));
+				rrDataFlag3SD=cat(1,rrDataFlag3SD,rrDataFlag(previousN:end));
+				dlmwrite([pathName,'data_generated_for_rsaToolbox\',filePrefix01,'_3SD_IBI.csv'],ibi3SD,'\t');
+				dlmwrite([pathName,'data_generated_for_rsaToolbox\',filePrefix01,'_3SD_IBIflag.csv'],rrDataFlag3SD,'\t');
+				event_listString=[event_listString;{[num2str(length(find(rrDataFlag3SD==2))-(length(find(rrDataFlag==1))-1)),' intervals were added because the ibi was more than 3SD longer than expected.']}];
+			end;
+			end;
+
+			dlmwrite([pathName,'data_generated_for_rsaToolbox\',filePrefix01,'_TTOT.csv'],ttot,'\t');
+			dlmwrite([pathName,'data_generated_for_rsaToolbox\',filePrefix01,'_VT.csv'],vt,'\t');
+			dlmwrite([pathName,'data_generated_for_rsaToolbox\',filePrefix01,'_IBI.csv'],ibi,'\t');
+			event_listString=[event_listString;{['Saving TTOT [s], VT [l], IBI [ms] to separate files at ',pathName,'data_generated_for_rsaToolbox\']}];
+			event_listString=[event_listString;{['Saving ',filePrefix01,'_TTOT.csv']}];
+			event_listString=[event_listString;{['Saving ',filePrefix01,'_VT.csv']}];
+			event_listString=[event_listString;{['Saving ',filePrefix01,'_IBI.csv']}];
+
+			dlmwrite([pathName,'data_generated_for_rsaToolbox\',filePrefix01,'_IBIflag.csv'],rrDataFlag,'\t');
+			event_listString=[event_listString;{['Saving information about missing ibi (flag: 1=missing) at ',pathName,'data_generated_for_rsaToolbox\']}];
+			event_listString=[event_listString;{['Saving ',filePrefix01,'_IBIflag.csv']}];
+
+			dlmwrite([pathName,'data_generated_for_rsaToolbox\',filePrefix01,'_TTOTflag.csv'],flagTtot,'\t');
+			event_listString=[event_listString;{['Saving information about missing breathing cycles (flag: 1=missing) at ',pathName,'data_generated_for_rsaToolbox\']}];
+			event_listString=[event_listString;{['Saving ',filePrefix01,'_TTOTflag.csv']}];
+
+			fid = fopen([pathName,'data_generated_for_rsaToolbox\description.txt'],'a');
+			fprintf(fid,'%s\t',pathName);
+			fprintf(fid,'%s\t',tmpBatchFileSavename);
+			if noOfFilenameElements>0
+				fprintf(fid,'%s\t',tmpBatchFileSavenamePrint);
+			end;
+			fprintf(fid,'%s\t',num2str(mean(ibi(find(rrDataFlag==0),1))));
+			fprintf(fid,'%s\t',num2str(std(ibi(find(rrDataFlag==0),1))));
+			fprintf(fid,'%s\t',num2str(num2str(mean(vt(find(flagTtot==0),1)))));
+			fprintf(fid,'%s\t',num2str(std(vt(find(flagTtot==0),1))));
+			fprintf(fid,'%s\t',num2str(mean(ttot(find(flagTtot==0),1))));
+			fprintf(fid,'%s\t',num2str(std(ttot(find(flagTtot==0),1))));
+			fprintf(fid,'%s\t',num2str(length(find(flagTtot==1))));
+			fprintf(fid,'%s\t',num2str(length(find(rrDataFlag==1))-1));
+			fprintf(fid,'%s\t',num2str(length(ibiFlagPos1SD)));
+%			fprintf(fid,'%s\t',num2str(length(find(rrDataFlag1SD==2)))-(length(find(rrDataFlag==1))-1));
+			fprintf(fid,'%s\t',num2str(length(ibiFlagPos2SD)));
+%			fprintf(fid,'%s\t',num2str(length(find(rrDataFlag2SD==2)))-(length(find(rrDataFlag==1))-1));
+			fprintf(fid,'%s\t',num2str(length(ibiFlagPos3SD)));
+%			fprintf(fid,'%s\t',num2str(length(find(rrDataFlag3SD==2)))-(length(find(rrDataFlag==1))-1));
+			fprintf(fid,'\n');
+			fclose(fid);
+
+			event_listString=[event_listString;{'______________________________________________________________________'}];
+			event_listString=[event_listString;{['Descriptive overview of the data based on valid information in files with prefix ',filePrefix01,':']}];
+			event_listString=[event_listString;{['IBI [ms]: M=',num2str(mean(ibi(find(rrDataFlag~=1),1))),', SD=',num2str(std(ibi(find(rrDataFlag~=1),1)))]}];
+			event_listString=[event_listString;{['VT   [l]: M=',num2str(mean(vt(find(flagTtot~=1),1))),', SD=',num2str(std(vt(find(flagTtot~=1),1)))]}];
+			event_listString=[event_listString;{['TTOT [s]: M=',num2str(mean(ttot(find(flagTtot~=1),1))),', SD=',num2str(std(ttot(find(flagTtot~=1),1)))]}];
+			event_listString=[event_listString;{['There are ',num2str(length(find(flagTtot==1))),' intervals with one or more missing breathing cycles.']}];
+			event_listString=[event_listString;{['There are ',num2str(length(find(rrDataFlag==1))-1),' intervals with one or more missing ibi.']}];
+			event_listString=[event_listString;{'______________________________________________________________________'}];
+			set(handles.event_list,'String',event_listString);
+			sTemp=size(event_listString);
+			set(handles.event_list,'Value',sTemp(1,1));
+			guidata(hObject,handles);
+		end;
+	end;
+	event_listString=get(handles.event_list,'String');
+	event_listString=[event_listString;{'WARNING: Do not use these files to compute means etc. for IBI, VT or TTOT!'}];
+	event_listString=[event_listString;{'This import filter automatically fills in missing data and adds information'}];
+	event_listString=[event_listString;{'to allow rsaToolbox to exhaust the given information.'}];
+	event_listString=[event_listString;{' '}];
+    if errorLogger_Resp==0 & errorLogger_RR==0
+    	event_listString=[event_listString;{['Import filter for VivoSense',char(174),' data export v01 - terminated succesfully.']}];
+    else
+    	event_listString=[event_listString;{['Import filter for VivoSense',char(174),' data export v01 - procdure complete.']}];
+    	event_listString=[event_listString;{[' ']}];
+    	event_listString=[event_listString;{['WARNING!!! There have been errors. Check the log in the Event Monitor!']}];
+    end;
+	event_listString=[event_listString;{'______________________________________________________________________'}];
+	set(handles.event_list,'String',event_listString);
+	sTemp=size(event_listString);
+	set(handles.event_list,'Value',sTemp(1,1));
+	guidata(hObject,handles);
+
+% --------------------------------------------------------------------
+function vivosenseImport_v02_Callback(hObject, eventdata, handles)
+% hObject	handle to vivosenseImport_v02 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles	structure with handles and user data (see GUIDATA)
+	event_listString=get(handles.event_list,'String');
+	event_listString=[event_listString;{['Import filter for Vivonoetics',char(174),' VivoSense',char(174),' data export v02. - Copyright ',char(169),' 2013 by Stefan M. Schulz']}];
+	event_listString=[event_listString;{'______________________________________________________________________'}];
+	event_listString=[event_listString;{'Quick Reference:'}];
+	event_listString=[event_listString;{'Two exports are required to use this tool:'}];
+	event_listString=[event_listString;{'The EKG R-peak (RR) export file has to include the following columns:'}];
+	event_listString=[event_listString;{'Index,Timestamp,RR,...'}];
+	event_listString=[event_listString;{'The respiration export file has to include the following columns:'}];
+	event_listString=[event_listString;{'Index,Timestamp,Insp Vol,Exp Vol,...'}];
+	event_listString=[event_listString;{'Exports must be saved in CSV format!'}];
+	event_listString=[event_listString;{'Note that the files should never contain additional data!'}];
+	event_listString=[event_listString;{'Internal format (i.e. column assignment) is crucial for proper function!'}];
+	event_listString=[event_listString;{'The last 12 characters of Timestamp must comply with the following format: 10:50:18.349'}];
+	event_listString=[event_listString;{'Note that the exported data is converted to the following units:'}];
+	event_listString=[event_listString;{'IBI [ms], VT [ml], TTOT [sec].'}];
+	event_listString=[event_listString;{'______________________________________________________________________'}];
+	set(handles.event_list,'String',event_listString);
+	sTemp=size(event_listString);
+	set(handles.event_list,'Value',sTemp(1,1));
+	guidata(hObject,handles);
+    errorLogger_Resp=0;
+    errorLogger_RR=0;
+
+	[fileName,pathName] = uigetfile({'*.csv','comma delimited files (*.csv)'},['Select any file from batch list.']);
+	if isequal([fileName,pathName],[0,0])
+		batchList=fileName;
+		event_listString=get(handles.event_list,'String');
+		event_listString=[event_listString;{'Please, select a valid file.'}];
+		event_listString=[event_listString;{['VivoSense',char(174),' data import v02 aborts.']}];
+		event_listString=[event_listString;{'______________________________________________________________________'}];
+		set(handles.event_list,'String',event_listString);
+		sTemp=size(event_listString);
+		set(handles.event_list,'Value',sTemp(1,1));
+		guidata(hObject,handles);
+		return
+		% Otherwise construct the fullfilename and Check and load the file.
+	else
+		%analyse filenames
+		cd(pathName);
+		dateienResp=dir('*_Resp.csv');
+		dateienRR=dir('*_RR.csv');
+
+		for i=1:length(dateienResp)
+
+			fileResp=getfield(dateienResp(i,1),'name');
+			filePrefixResp=fileResp(1:end-9);
+			fileRR=getfield(dateienRR(i,1),'name');
+			filePrefixRR=fileRR(1:end-7);
+
+			if length(filePrefixResp)==length(filePrefixRR) & filePrefixResp==filePrefixRR
+			else
+				event_listString=get(handles.event_list,'String');
+				event_listString=[event_listString;{'Inconsistencies in batch file list found.'}];
+				event_listString=[event_listString;{['VivoSense',char(174),' data import v02 aborts. - please check your data!']}];
+				event_listString=[event_listString;{'______________________________________________________________________'}];
+				set(handles.event_list,'String',event_listString);
+				sTemp=size(event_listString);
+				set(handles.event_list,'Value',sTemp(1,1));
+				guidata(hObject,handles);
+				return
+			end;
+		end;
+		batchList=dateienResp;
+		event_listString=get(handles.event_list,'String');
+		event_listString=[event_listString;{'File list for batch processing successfully created.'}];
+		cd(pathName);
+		event_listString=[event_listString;{['Data will be imported from ',pathName]}];
+		warning off MATLAB:MKDIR:DirectoryExists;
+		mkdir('data_generated_for_rsaToolbox');
+		event_listString=[event_listString;{['Data will be saved to ',pathName,'data_generated_for_rsaToolbox\..']}];
+		event_listString=[event_listString;{['Check file ',pathName,'data_generated_for_rsaToolbox\description.txt for a summary of descriptive information.']}];
+		event_listString=[event_listString;{'______________________________________________________________________'}];
+		set(handles.event_list,'String',event_listString);
+		sTemp=size(event_listString);
+		set(handles.event_list,'Value',sTemp(1,1));
+		guidata(hObject,handles);
+
+		for j=1:length(batchList)
+
+			filename01=getfield(batchList(j,1),'name');
+			filePrefix01=filename01(1:end-9);
+			filename02=[filePrefix01,'_RR.csv'];
+
+			tmpBatchFileSavename=filePrefix01;
+			noOfFilenameElements=0;
+			global splitFilename;
+			global answer;
+			switch splitFilename
+				case 0
+				case 1
+					aC=find(~isstrprop(tmpBatchFileSavename,'alphanum'));
+					bC=aC(1,find(diff(find(~isstrprop(tmpBatchFileSavename,'alphanum')))==1));
+					if ~isempty(bC)
+						tmpBatchFileSavename(bC)=[];
+					end;
+					noOfFilenameElements=length(find(~isstrprop(tmpBatchFileSavename,'alphanum')));
+					tmpBatchFileSavenamePrint=tmpBatchFileSavename;
+					tmpBatchFileSavenamePrint(~isstrprop(tmpBatchFileSavename,'alphanum'))=char(9);
+				case 2
+					aC=find(ismember(tmpBatchFileSavename,char(answer)));
+					bC=aC(1,find(diff(find(ismember(tmpBatchFileSavename,char(answer))))==1));
+					if ~isempty(bC)
+						tmpBatchFileSavename(bC)=[];
+					end;
+					noOfFilenameElements=length(find(ismember(tmpBatchFileSavename,char(answer))));
+					tmpBatchFileSavenamePrint=tmpBatchFileSavename;
+					tmpBatchFileSavenamePrint(ismember(tmpBatchFileSavename,char(answer)))=char(9);
+			end;
+
+			if j==1
+				fid = fopen([pathName,'data_generated_for_rsaToolbox\description.txt'],'a');
+				fprintf(fid,'%s\n',char(['rsaToolbox v2.0.1 by Stefan M. Schulz <schulz@psychologie.uni-wuerzburg.de> - VivoSense',char(174),' data import v02:',char(9),datestr(now)]));
+				fprintf(fid,'%s\t','data folder');
+				if noOfFilenameElements>0
+					fprintf(fid,'%s\t','dataset');
+					for nFilenameElements=1:noOfFilenameElements+1
+						fprintf(fid,'%s\t',['filename part ',num2str(nFilenameElements)]);
+					end;
+					fprintf(fid,'%s\t','IBI Mean [ms]','IBI SD','VT Mean [l]','VT SD','TTOT Mean [s]','TTOT SD','Number of intervals with one or more missing breathing cycles','Number of intervals with one or more missing IBI','Number of IBI > 1SD of mean IBI','Number of IBI > 2SD of mean IBI','Number of IBI > 3SD of mean IBI');
+				else
+					fprintf(fid,'%s\t','dataset','IBI Mean [ms]','IBI SD','VT Mean [l]','VT SD','TTOT Mean [s]','TTOT SD','Number of intervals with one or more missing breathing cycles','Number of intervals with one or more missing IBI','Number of IBI > 1SD of mean IBI','Number of IBI > 2SD of mean IBI','Number of IBI > 3SD of mean IBI');
+				end;
+				fprintf(fid,'\n');
+				fclose(fid);
+      			fid = fopen([pathName,'data_generated_for_rsaToolbox\errorLog.txt'],'a');
+    			fprintf(fid,'%s',char(['rsaToolbox v2.0.1 by Stefan M. Schulz <schulz@psychologie.uni-wuerzburg.de> - VivoSense',char(174),' data import v02:',char(9),datestr(now)]));
+				fprintf(fid,'\n');
+				fclose(fid);
+			end;
+
+			%GET RESPIRATION DATA...
+			event_listString=get(handles.event_list,'String');
+			event_listString=[event_listString;{['Importing ',filename01]}];
+			file01=importdata([pathName,filename01]);
+			file01=struct2cell(file01);
+			respData=file01{1,1};
+			respText=file01{2,1};
+			respTimeA=char(respText{2:end,2});
+			respTimeA=respTimeA(:,length(respTimeA(1,:))-11:end);
+			respTime=(str2num(respTimeA(:,1:2))*60*60*1000)+(str2num(respTimeA(:,4:5))*60*1000)+(str2num(respTimeA(:,7:end))*1000);
+
+            %'Index,Timestamp,Insp Vol,Exp Vol,...'
+            respHeader=char(respText{1,:});
+            respHeader=cellstr(respHeader);
+            respHeader=(strtrim(respHeader'));
+            respHeader3={};
+            for n=1:length(respHeader(1,:))
+                respHeader2=strsplit(respHeader{1,n},',');
+                respHeader3=cat(2,respHeader3,respHeader2);
+            end;
+            respHeader=respHeader3;
+
+  			fid = fopen([pathName,'data_generated_for_rsaToolbox\errorLog.txt'],'a');
+            if find(strcmp('Insp Vol',respHeader))==3 & find(strcmp('Exp Vol',respHeader))==4
+                fprintf(fid,'%s','Data in file ',filename01,' looks fine.');
+    			fprintf(fid,'\n');
+            else
+      			event_listString=[event_listString;{['WARNING!!! ViVol or VeVol in file ',filename01,' is NOT in the expected column of your respiration export. Please check your data!' ]}];
+      			event_listString=[event_listString;{['WARNING!!! Program continues but data for ',filename01,' may be incorrect!' ]}];
+                fprintf(fid,'%s','WARNING!!! "Insp Vol" or "Insp Vol" in file ',filename01,' is NOT in the expected column of your respiration export. Please check your data!');
+    			fprintf(fid,'\n');
+                errorLogger_Resp=1;
+            end;
+    		fclose(fid);
+
+            
+			vt=(respData(:,1)+respData(:,2))/2;
+			ttot=respData(:,11);
+
+			if length(respTime(:,1)) > length(ttot)
+				tempNaNs=ones(length(respTime(:,1))-length(ttot));
+				tempNaNs=NaN;
+				vt=[tempNaNs';vt];
+				ttot=[tempNaNs';ttot];
+			end;
+
+			flagTtot=isnan(ttot);
+
+			%restoring missing respiration data, and producing flags to keep track of it
+			for n=(find(isnan(ttot)))';
+				ttot(n,1)=(respTime(n+1,:)-respTime(n,:))/1000;
+			end;
+
+			%GET IBI DATA...
+			event_listString=[event_listString;{['Importing ',filename02]}];
+			file02=importdata([pathName,filename02]);
+			file02=struct2cell(file02);
+			rrData=file02{1,1};
+			rrText=file02{2,1};
+			rrTimeA=char(rrText{2:end,2});
+			rrTimeA=rrTimeA(:,length(rrTimeA(1,:))-11:end);
+			rrTime=(str2num(rrTimeA(:,1:2))*60*60*1000)+(str2num(rrTimeA(:,4:5))*60*1000)+(str2num(rrTimeA(:,7:end))*1000);
+
+           	%'Index,Timestamp,RR,...'
+            rrHeader=char(rrText{1,:});
+            rrHeader=cellstr(rrHeader);
+            rrHeader=(strtrim(rrHeader'));
+            rrHeader3={};
+            for n=1:length(rrHeader(1,:))
+                rrHeader2=strsplit(rrHeader{1,n},',');
+                rrHeader3=cat(2,rrHeader3,rrHeader2);
+            end;
+            rrHeader=rrHeader3;
+
+  			fid = fopen([pathName,'data_generated_for_rsaToolbox\errorLog.txt'],'a');
+            if find(strcmp('RR',rrHeader))==3
+                fprintf(fid,'%s','Data in file ',filename02,' looks fine.');
+    			fprintf(fid,'\n');
+            else
+      			event_listString=[event_listString;{['WARNING!!! RR in file ',filename02,' is NOT in the expected column of your EKG/RR export. Please check your data!' ]}];
+      			event_listString=[event_listString;{['WARNING!!! Program continues but data for ',filename02,' may be incorrect!' ]}];
+                fprintf(fid,'%s','WARNING!!! RR in file ',filename02,' is NOT in the expected column of your EKG/RR export. Please check your data!');
+    			fprintf(fid,'\n');
+                errorLogger_RR=1;
+            end;
+			fclose(fid);
+            
+			ibi=diff(rrTime)/1000; %referenced to first entry in rrTime as time zero
+
+			%producing flags for missing data
+			rrDataFlag=isnan(rrData(:,1));
+
+			%SYNCING RESPIRATION AND IBI DATA
+			respTimeStartNum=respTime(find(flagTtot==0),1);
+			respTimeStartNum=(respTimeStartNum(1,1));
+
+			n=1;
+			while rrTime(n,1)<respTime(1,1)
+				n=n+1;
+			end;
+			syncTime=(rrTime(n,1)-respTime(1,1));
+			syncTimeMs=syncTime/1000;
+
+			ibi=ibi(n:end,1);
+			ibi=cat(1,syncTimeMs,ibi);
+			rrDataFlag=cat(1,1,rrDataFlag(n:end-1,1));
+
+			%ttot is in sec
+			vt=vt/1000;%l
+			ibi=ibi*1000;%ms
+
+			global expertMode;
+			if expertMode==1
+				if j==1
+					interpolateIBISelection=menu('Interpolate IBI marked as artifact and comprising outliers (> 1, 2, and 3 SD) and create additonal output files?','1 - yes','2 - no');
+				end;
+			else
+				interpolateIBISelection=2;
+			end;
+
+			ibiFlagPos=find(rrDataFlag==1);
+			ibiFlagPos=ibiFlagPos(2:end,:);
+			if ~isempty(ibiFlagPos) & ~isempty(find(rrDataFlag==0))
+				ibiFlagPos1SD=find(ibi(ibiFlagPos)>(mean(ibi(find(rrDataFlag==0)),1)+std(ibi(find(rrDataFlag==0)))));
+				ibiFlagPos2SD=find(ibi(ibiFlagPos)>(mean(ibi(find(rrDataFlag==0)),1)+2*std(ibi(find(rrDataFlag==0)))));
+				ibiFlagPos3SD=find(ibi(ibiFlagPos)>(mean(ibi(find(rrDataFlag==0)),1)+3*std(ibi(find(rrDataFlag==0)))));
+            else
+    			ibiFlagPos1SD=[];
+    			ibiFlagPos2SD=[];
+        		ibiFlagPos3SD=[];
+            end;
+
+			if interpolateIBISelection==1
+			if ~isempty(ibiFlagPos1SD)
+				ibiFlagPos1SD=ibiFlagPos(ibiFlagPos1SD);
+				previousN=1;
+				ibi1SD=[];
+				rrDataFlag1SD=[];
+				for n=1:length(ibiFlagPos1SD)
+					if ibiFlagPos1SD(n) < length(ibi)
+						den=round(ibi(ibiFlagPos1SD(n))/((ibi(ibiFlagPos1SD(n)-1)+ibi(ibiFlagPos1SD(n)+1))/2));
+						ibiDen=round(ibi(ibiFlagPos1SD(n))/den);
+						ibiDenStretch=([1:1:den]*0)+ibiDen;
+%						error1SD(n)=(ibiDen*den)-ibi(ibiFlagPos1SD(n));%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%xxx
+%						error1SD(n)=sum(ibiDenStretch)-ibi(ibiFlagPos1SD(n));%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%xxx
+						if n+1 <= length(ibiFlagPos1SD)
+							if ibiFlagPos1SD(n)+1 < ibiFlagPos1SD(n+1)
+								artifactFreePostIbiDenStretch=ibi(ibiFlagPos1SD(n)+1:ibiFlagPos1SD(n+1)-1);
+								artifactFreePostIbiDenStretchFlag=rrDataFlag(ibiFlagPos1SD(n)+1:ibiFlagPos1SD(n+1)-1);
+							else
+								artifactFreePostIbiDenStretch=[];
+								artifactFreePostIbiDenStretchFlag=[];
+							end;
+						elseif n+1 == length(ibiFlagPos1SD)+1
+							artifactFreePostIbiDenStretch=ibi(ibiFlagPos1SD(n)+1:end);
+							artifactFreePostIbiDenStretchFlag=rrDataFlag(ibiFlagPos1SD(n)+1:end);
+						else
+							artifactFreePostIbiDenStretch=[];
+							artifactFreePostIbiDenStretchFlag=[];
+						end;
+						ibi1SD=cat(1,ibi1SD,[ibi(previousN:ibiFlagPos1SD(n)-1);ibiDenStretch';artifactFreePostIbiDenStretch]);
+						rrDataFlagDenStretch=([1:1:den]*0)+2;
+						rrDataFlag1SD=cat(1,rrDataFlag1SD,[rrDataFlag(previousN:ibiFlagPos1SD(n)-1);rrDataFlagDenStretch';artifactFreePostIbiDenStretchFlag]);
+						previousN=length(ibi1SD)+1;
+					end;
+				end;
+%				sum(error1SD);%%%%%%%%%%%%%%%%%xxx
+				ibi1SD=cat(1,ibi1SD,ibi(previousN:end));
+				rrDataFlag1SD=cat(1,rrDataFlag1SD,rrDataFlag(previousN:end));
+				dlmwrite([pathName,'data_generated_for_rsaToolbox\',filePrefix01,'_1SD_IBI.csv'],ibi1SD,'\t');
+				dlmwrite([pathName,'data_generated_for_rsaToolbox\',filePrefix01,'_1SD_IBIflag.csv'],rrDataFlag1SD,'\t');
+				event_listString=[event_listString;{[num2str(length(find(rrDataFlag1SD==2))-(length(find(rrDataFlag==1))-1)),' intervals were added because the ibi was more than 1SD longer than expected.']}];
+			end;
+			if ~isempty(ibiFlagPos2SD)
+				ibiFlagPos2SD=ibiFlagPos(ibiFlagPos2SD);
+				previousN=1;
+				ibi2SD=[];
+				rrDataFlag2SD=[];
+				for n=1:length(ibiFlagPos2SD)
+					if ibiFlagPos2SD(n) < length(ibi)
+						den=round(ibi(ibiFlagPos2SD(n))/((ibi(ibiFlagPos2SD(n)-1)+ibi(ibiFlagPos2SD(n)+1))/2));
+						ibiDen=round(ibi(ibiFlagPos2SD(n))/den);
+						ibiDenStretch=([1:1:den]*0)+ibiDen;
+%						error2SD(n)=(ibiDen*den)-ibi(ibiFlagPos2SD(n));%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%xxx
+%						error2SD(n)=sum(ibiDenStretch)-ibi(ibiFlagPos2SD(n));%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%xxx
+						if n+1 <= length(ibiFlagPos2SD)
+							if ibiFlagPos2SD(n)+1 < ibiFlagPos2SD(n+1)
+								artifactFreePostIbiDenStretch=ibi(ibiFlagPos2SD(n)+1:ibiFlagPos2SD(n+1)-1);
+								artifactFreePostIbiDenStretchFlag=rrDataFlag(ibiFlagPos2SD(n)+1:ibiFlagPos2SD(n+1)-1);
+							else
+								artifactFreePostIbiDenStretch=[];
+								artifactFreePostIbiDenStretchFlag=[];
+							end;
+						elseif n+1 == length(ibiFlagPos2SD)+1
+							artifactFreePostIbiDenStretch=ibi(ibiFlagPos2SD(n)+1:end);
+							artifactFreePostIbiDenStretchFlag=rrDataFlag(ibiFlagPos2SD(n)+1:end);
+						else
+							artifactFreePostIbiDenStretch=[];
+							artifactFreePostIbiDenStretchFlag=[];
+						end;
+						ibi2SD=cat(1,ibi2SD,[ibi(previousN:ibiFlagPos2SD(n)-1);ibiDenStretch';artifactFreePostIbiDenStretch]);
+						rrDataFlagDenStretch=([1:1:den]*0)+2;
+						rrDataFlag2SD=cat(1,rrDataFlag2SD,[rrDataFlag(previousN:ibiFlagPos2SD(n)-1);rrDataFlagDenStretch';artifactFreePostIbiDenStretchFlag]);
+						previousN=length(ibi2SD)+1;
+					end;
+				end;
+%				sum(error2SD);%%%%%%%%%%%%%%%%%xxx
+				ibi2SD=cat(1,ibi2SD,ibi(previousN:end));
+				rrDataFlag2SD=cat(1,rrDataFlag2SD,rrDataFlag(previousN:end));
+				dlmwrite([pathName,'data_generated_for_rsaToolbox\',filePrefix01,'_2SD_IBI.csv'],ibi2SD,'\t');
+				dlmwrite([pathName,'data_generated_for_rsaToolbox\',filePrefix01,'_2SD_IBIflag.csv'],rrDataFlag2SD,'\t');
+				event_listString=[event_listString;{[num2str(length(find(rrDataFlag2SD==2))-(length(find(rrDataFlag==1))-1)),' intervals were added because the ibi was more than 2SD longer than expected.']}];
+			end;
+			if ~isempty(ibiFlagPos3SD)
+				ibiFlagPos3SD=ibiFlagPos(ibiFlagPos3SD);
+				previousN=1;
+				ibi3SD=[];
+				rrDataFlag3SD=[];
+				for n=1:length(ibiFlagPos3SD)
+					if ibiFlagPos3SD(n) < length(ibi)
+						den=round(ibi(ibiFlagPos3SD(n))/((ibi(ibiFlagPos3SD(n)-1)+ibi(ibiFlagPos3SD(n)+1))/2));
+						ibiDen=round(ibi(ibiFlagPos3SD(n))/den);
+						ibiDenStretch=([1:1:den]*0)+ibiDen;
+%						error3SD(n)=(ibiDen*den)-ibi(ibiFlagPos3SD(n));%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%xxx
+%						error3SD(n)=sum(ibiDenStretch)-ibi(ibiFlagPos3SD(n));%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%xxx
+						if n+1 <= length(ibiFlagPos3SD)
+							if ibiFlagPos3SD(n)+1 < ibiFlagPos3SD(n+1)
+								artifactFreePostIbiDenStretch=ibi(ibiFlagPos3SD(n)+1:ibiFlagPos3SD(n+1)-1);
+								artifactFreePostIbiDenStretchFlag=rrDataFlag(ibiFlagPos3SD(n)+1:ibiFlagPos3SD(n+1)-1);
+							else
+								artifactFreePostIbiDenStretch=[];
+								artifactFreePostIbiDenStretchFlag=[];
+							end;
+						elseif n+1 == length(ibiFlagPos3SD)+1
+							artifactFreePostIbiDenStretch=ibi(ibiFlagPos3SD(n)+1:end);
+							artifactFreePostIbiDenStretchFlag=rrDataFlag(ibiFlagPos3SD(n)+1:end);
+						else
+						artifactFreePostIbiDenStretch=[];
+						artifactFreePostIbiDenStretchFlag=[];
+						end;
+						ibi3SD=cat(1,ibi3SD,[ibi(previousN:ibiFlagPos3SD(n)-1);ibiDenStretch';artifactFreePostIbiDenStretch]);
+						rrDataFlagDenStretch=([1:1:den]*0)+2;
+						rrDataFlag3SD=cat(1,rrDataFlag3SD,[rrDataFlag(previousN:ibiFlagPos3SD(n)-1);rrDataFlagDenStretch';artifactFreePostIbiDenStretchFlag]);
+						previousN=length(ibi3SD)+1;
+					end;
+				end;
+%				sum(error3SD);%%%%%%%%%%%%%%%%%xxx
+				ibi3SD=cat(1,ibi3SD,ibi(previousN:end));
+				rrDataFlag3SD=cat(1,rrDataFlag3SD,rrDataFlag(previousN:end));
+				dlmwrite([pathName,'data_generated_for_rsaToolbox\',filePrefix01,'_3SD_IBI.csv'],ibi3SD,'\t');
+				dlmwrite([pathName,'data_generated_for_rsaToolbox\',filePrefix01,'_3SD_IBIflag.csv'],rrDataFlag3SD,'\t');
+				event_listString=[event_listString;{[num2str(length(find(rrDataFlag3SD==2))-(length(find(rrDataFlag==1))-1)),' intervals were added because the ibi was more than 3SD longer than expected.']}];
+			end;
+			end;
+
+			dlmwrite([pathName,'data_generated_for_rsaToolbox\',filePrefix01,'_TTOT.csv'],ttot,'\t');
+			dlmwrite([pathName,'data_generated_for_rsaToolbox\',filePrefix01,'_VT.csv'],vt,'\t');
+			dlmwrite([pathName,'data_generated_for_rsaToolbox\',filePrefix01,'_IBI.csv'],ibi,'\t');
+			event_listString=[event_listString;{['Saving TTOT [s], VT [l], IBI [ms] to separate files at ',pathName,'data_generated_for_rsaToolbox\']}];
+			event_listString=[event_listString;{['Saving ',filePrefix01,'_TTOT.csv']}];
+			event_listString=[event_listString;{['Saving ',filePrefix01,'_VT.csv']}];
+			event_listString=[event_listString;{['Saving ',filePrefix01,'_IBI.csv']}];
+
+			dlmwrite([pathName,'data_generated_for_rsaToolbox\',filePrefix01,'_IBIflag.csv'],rrDataFlag,'\t');
+			event_listString=[event_listString;{['Saving information about missing ibi (flag: 1=missing) at ',pathName,'data_generated_for_rsaToolbox\']}];
+			event_listString=[event_listString;{['Saving ',filePrefix01,'_IBIflag.csv']}];
+
+			dlmwrite([pathName,'data_generated_for_rsaToolbox\',filePrefix01,'_TTOTflag.csv'],flagTtot,'\t');
+			event_listString=[event_listString;{['Saving information about missing breathing cycles (flag: 1=missing) at ',pathName,'data_generated_for_rsaToolbox\']}];
+			event_listString=[event_listString;{['Saving ',filePrefix01,'_TTOTflag.csv']}];
+
+			fid = fopen([pathName,'data_generated_for_rsaToolbox\description.txt'],'a');
+			fprintf(fid,'%s\t',pathName);
+			fprintf(fid,'%s\t',tmpBatchFileSavename);
+			if noOfFilenameElements>0
+				fprintf(fid,'%s\t',tmpBatchFileSavenamePrint);
+			end;
+			fprintf(fid,'%s\t',num2str(mean(ibi(find(rrDataFlag==0),1))));
+			fprintf(fid,'%s\t',num2str(std(ibi(find(rrDataFlag==0),1))));
+			fprintf(fid,'%s\t',num2str(num2str(mean(vt(find(flagTtot==0),1)))));
+			fprintf(fid,'%s\t',num2str(std(vt(find(flagTtot==0),1))));
+			fprintf(fid,'%s\t',num2str(mean(ttot(find(flagTtot==0),1))));
+			fprintf(fid,'%s\t',num2str(std(ttot(find(flagTtot==0),1))));
+			fprintf(fid,'%s\t',num2str(length(find(flagTtot==1))));
+			fprintf(fid,'%s\t',num2str(length(find(rrDataFlag==1))-1));
+			fprintf(fid,'%s\t',num2str(length(ibiFlagPos1SD)));
+%			fprintf(fid,'%s\t',num2str(length(find(rrDataFlag1SD==2)))-(length(find(rrDataFlag==1))-1));
+			fprintf(fid,'%s\t',num2str(length(ibiFlagPos2SD)));
+%			fprintf(fid,'%s\t',num2str(length(find(rrDataFlag2SD==2)))-(length(find(rrDataFlag==1))-1));
+			fprintf(fid,'%s\t',num2str(length(ibiFlagPos3SD)));
+%			fprintf(fid,'%s\t',num2str(length(find(rrDataFlag3SD==2)))-(length(find(rrDataFlag==1))-1));
+			fprintf(fid,'\n');
+			fclose(fid);
+
+			event_listString=[event_listString;{'______________________________________________________________________'}];
+			event_listString=[event_listString;{['Descriptive overview of the data based on valid information in files with prefix ',filePrefix01,':']}];
+			event_listString=[event_listString;{['IBI [ms]: M=',num2str(mean(ibi(find(rrDataFlag~=1),1))),', SD=',num2str(std(ibi(find(rrDataFlag~=1),1)))]}];
+			event_listString=[event_listString;{['VT   [l]: M=',num2str(mean(vt(find(flagTtot~=1),1))),', SD=',num2str(std(vt(find(flagTtot~=1),1)))]}];
+			event_listString=[event_listString;{['TTOT [s]: M=',num2str(mean(ttot(find(flagTtot~=1),1))),', SD=',num2str(std(ttot(find(flagTtot~=1),1)))]}];
+			event_listString=[event_listString;{['There are ',num2str(length(find(flagTtot==1))),' intervals with one or more missing breathing cycles.']}];
+			event_listString=[event_listString;{['There are ',num2str(length(find(rrDataFlag==1))-1),' intervals with one or more missing ibi.']}];
+			event_listString=[event_listString;{'______________________________________________________________________'}];
+			set(handles.event_list,'String',event_listString);
+			sTemp=size(event_listString);
+			set(handles.event_list,'Value',sTemp(1,1));
+			guidata(hObject,handles);
+		end;
+	end;
+	event_listString=get(handles.event_list,'String');
+	event_listString=[event_listString;{'WARNING: Do not use these files to compute means etc. for IBI, VT or TTOT!'}];
+	event_listString=[event_listString;{'This import filter automatically fills in missing data and adds information'}];
+	event_listString=[event_listString;{'to allow rsaToolbox to exhaust the given information.'}];
+	event_listString=[event_listString;{' '}];
+
+    if errorLogger_Resp==0 & errorLogger_RR==0
+    	event_listString=[event_listString;{['Import filter for VivoSense',char(174),' data export v02 - terminated succesfully.']}];
+    else
+    	event_listString=[event_listString;{['Import filter for VivoSense',char(174),' data export v02 - procdure complete.']}];
+    	event_listString=[event_listString;{[' ']}];
+    	event_listString=[event_listString;{['WARNING!!! There have been errors. Check the log in the Event Monitor!']}];
+    end;
+	event_listString=[event_listString;{'______________________________________________________________________'}];
+	set(handles.event_list,'String',event_listString);
+	sTemp=size(event_listString);
+	set(handles.event_list,'Value',sTemp(1,1));
+	guidata(hObject,handles);
